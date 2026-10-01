@@ -32,15 +32,15 @@ export const notifyOwner = createServerFn({ method: "POST" })
     const o = data as Order;
     const result: NotifyResult = { email: "not_configured", whatsapp: "not_configured", errors: [] };
 
-    const resendKey = process.env.RESEND_API_KEY;
-    const ownerEmail = process.env.OWNER_EMAIL ?? "madhavsharma@97791"; // TODO: replace with full address
+    const resendKey = process.env['RESEND_API_KEY'];
+    const ownerEmail = process.env['OWNER_EMAIL'] ?? "madhavsharma@97791"; // TODO: replace with full address
     if (resendKey && /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(ownerEmail)) {
       try {
         const r = await fetch("https://api.resend.com/emails", {
           method: "POST",
           headers: { Authorization: `Bearer ${resendKey}`, "Content-Type": "application/json" },
           body: JSON.stringify({
-            from: process.env.EMAIL_FROM ?? "MYNUS 360 Kiosk <onboarding@resend.dev>",
+            from: process.env['EMAIL_FROM'] ?? "MYNUS 360 Kiosk <onboarding@resend.dev>",
             to: [ownerEmail], subject: `New order #${o.number} — ₹${o.total}`, html: emailHtml(o),
           }),
         });
@@ -49,15 +49,15 @@ export const notifyOwner = createServerFn({ method: "POST" })
       } catch (e) { result.email = "failed"; result.errors.push(`email: ${String(e)}`); }
     }
 
-    const waToken = process.env.WHATSAPP_TOKEN;
-    const waPhoneId = process.env.WHATSAPP_PHONE_NUMBER_ID;
+    const waToken = process.env['WHATSAPP_TOKEN'];
+    const waPhoneId = process.env['WHATSAPP_PHONE_NUMBER_ID'];
     if (waToken && waPhoneId) {
       try {
         const r = await fetch(`https://graph.facebook.com/v20.0/${waPhoneId}/messages`, {
           method: "POST",
           headers: { Authorization: `Bearer ${waToken}`, "Content-Type": "application/json" },
           body: JSON.stringify({
-            messaging_product: "whatsapp", to: process.env.OWNER_WHATSAPP ?? "917889194214",
+            messaging_product: "whatsapp", to: process.env['OWNER_WHATSAPP'] ?? "917889194214",
             type: "text", text: { body: orderText(o) },
           }),
         });
