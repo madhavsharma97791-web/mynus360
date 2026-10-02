@@ -6,10 +6,10 @@ export type MenuItem = {
   id: string;
   name: string;
   category: Category;
-  group?: string;
-  note?: string; // e.g. "4 pieces"
+  group?: string | undefined;
+  note?: string | undefined; // e.g. "4 pieces"
   sizes: Size[]; // one entry with label "" when no size choice
-  image?: string;
+  image?: string | undefined;
 };
 
 export const CATEGORIES = [
@@ -28,7 +28,7 @@ const rml = (r: number, m: number, l: number): Size[] => [
   { label: "Regular", price: r }, { label: "Medium", price: m }, { label: "Large", price: l },
 ];
 
-type Row = [id: string, name: string, sizes: Size[], note?: string, group?: string];
+type Row = [id: string, name: string, sizes: Size[], note?: string | undefined, group?: string | undefined];
 const build = (category: Category, rows: Row[]): MenuItem[] =>
   rows.map(([id, name, sizes, note, group]) => ({ id, name, category, sizes, note, group, image: img[id] }));
 
