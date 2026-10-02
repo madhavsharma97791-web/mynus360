@@ -285,7 +285,7 @@ function FoodCard({ item, onOpen }: { item: MenuItem; onOpen: () => void }) {
 function ProductModal({ item, onClose, onAdd }: { item: MenuItem; onClose: () => void; onAdd: (i: MenuItem, size: string, price: number, qty: number) => void }) {
   const [sizeIdx, setSizeIdx] = useState(item.sizes.length > 1 ? 1 : 0);
   const [qty, setQty] = useState(1);
-  const size = item.sizes[sizeIdx];
+  const size = (item.sizes[sizeIdx] ?? item.sizes[0])!;
   return (
     <div className="fixed inset-0 z-40 grid place-items-center bg-background/85 p-4 backdrop-blur" onClick={onClose}>
       <div className="alert-pop flex max-h-[95vh] w-full max-w-2xl flex-col overflow-y-auto rounded-3xl border-2 border-primary bg-card" onClick={(e) => e.stopPropagation()}>
