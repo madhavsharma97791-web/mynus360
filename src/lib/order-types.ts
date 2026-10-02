@@ -2,9 +2,9 @@ export type CartLine = { key: string; itemId: string; name: string; size: string
 export type Order = {
   number: string;
   type: "Dine In" | "Takeaway";
-  table?: string;
-  customerName?: string;
-  customerPhone?: string;
+  table?: string | undefined;
+  customerName?: string | undefined;
+  customerPhone?: string | undefined;
   lines: CartLine[];
   subtotal: number;
   total: number;
