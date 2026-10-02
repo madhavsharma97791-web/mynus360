@@ -4,7 +4,7 @@ import { ArrowLeft, ArrowRight, Bell, Check, Minus, Plus, Printer, Search, Shopp
 import { CATEGORIES, LOGO_URL, MENU, STORE_URL, fromPrice, rupee, type Category, type MenuItem } from "@/lib/menu";
 import { OWNER_WHATSAPP, orderText, type CartLine, type NotifyResult, type Order } from "@/lib/order-types";
 import { notifyOwner } from "@/lib/notify.functions";
-import { playOrderAlert, unlockAudio } from "@/lib/sound";
+import { unlockAudio } from "@/lib/sound";
 
 type Step = "welcome" | "menu" | "review" | "type" | "details" | "payment" | "done";
 const CART_KEY = "m360-cart";
@@ -30,7 +30,6 @@ export function Kiosk() {
   const [order, setOrder] = useState<Order | null>(null);
   const [notify, setNotify] = useState<NotifyResult | null>(null);
   const [placing, setPlacing] = useState(false);
-  const [alert, setAlert] = useState(false);
   const sendNotify = useServerFn(notifyOwner);
 
   useEffect(() => {
@@ -71,8 +70,6 @@ export function Kiosk() {
     try { res = await sendNotify({ data: o }); }
     catch (e) { res = { email: "failed", whatsapp: "failed", errors: [String(e)] }; }
     setOrder(o); setNotify(res); setPlacing(false);
-    setAlert(true); void playOrderAlert();
-    setTimeout(() => setAlert(false), 3000);
     setStep("done");
   };
 
@@ -141,14 +138,6 @@ export function Kiosk() {
         </Shell>
       )}
       {step === "done" && order && <Confirmation order={order} notify={notify} onNew={reset} />}
-      {alert && (
-        <div className="fixed inset-0 z-50 grid place-items-center bg-background/70 backdrop-blur-sm">
-          <div className="alert-pop flex items-center gap-5 rounded-3xl border-4 border-primary-foreground bg-primary px-12 py-8 text-primary-foreground glow">
-            <Bell className="size-14 animate-bounce" />
-            <span className="font-display text-5xl uppercase">New Order Received</span>
-          </div>
-        </div>
-      )}
       {order && <Receipt order={order} />}
     </div>
   );
