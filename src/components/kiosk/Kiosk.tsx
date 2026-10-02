@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { ArrowLeft, ArrowRight, Bell, Check, Minus, Plus, Printer, Search, ShoppingBag, Trash2, X } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, Minus, Plus, Printer, Search, ShoppingBag, Trash2, X } from "lucide-react";
 import { CATEGORIES, LOGO_URL, MENU, STORE_URL, fromPrice, rupee, type Category, type MenuItem } from "@/lib/menu";
 import { OWNER_WHATSAPP, orderText, type CartLine, type NotifyResult, type Order } from "@/lib/order-types";
 import { notifyOwner } from "@/lib/notify.functions";
