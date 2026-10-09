@@ -10,7 +10,7 @@ export function orderLines(order: StaffOrder) {
   if (!Array.isArray(lines)) return [];
   return lines.flatMap(line => {
     if (!line || typeof line !== "object" || Array.isArray(line)) return [];
-    if (typeof line.name !== "string" || typeof line.qty !== "number" || typeof line.price !== "number") return [];
-    return [{ name: line.name, qty: line.qty, price: line.price, size: typeof line.size === "string" ? line.size : "" }];
+    if (typeof line['name'] !== "string" || typeof line['qty'] !== "number" || typeof line['price'] !== "number") return [];
+    return [{ name: line['name'], qty: line['qty'], price: line['price'], size: typeof line['size'] === "string" ? line['size'] : "" }];
   });
 }

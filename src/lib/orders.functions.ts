@@ -47,6 +47,10 @@ export const placeOrder = createServerFn({ method: "POST" })
       payment_method: data.payment,
     }).select("order_number,total").single();
     if (error || !row) {
+      if (error?.code === "23505") {
+        const retry = await supabaseAdmin.from("orders").select("order_number,total").eq("client_ref", data.clientRef).single();
+        if (retry.data) return { ok: true, number: `M360-${retry.data.order_number}`, total: retry.data.total };
+      }
       console.error("[placeOrder]", error);
       return { ok: false, error: "Could not send your order. Please try again." };
     }

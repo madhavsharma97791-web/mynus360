@@ -13,12 +13,12 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as StaffRouteImport } from './routes/staff'
-import { Route as AuthenticatedStaffRouteImport } from './routes/_authenticated/staff'
-import { Route as AuthenticatedStaffAnalyticsRouteImport } from './routes/_authenticated/staff.analytics'
-import { Route as AuthenticatedStaffOrdersRouteImport } from './routes/_authenticated/staff.orders'
-import { Route as AuthenticatedStaffOverviewRouteImport } from './routes/_authenticated/staff.overview'
-import { Route as AuthenticatedStaffSettingsRouteImport } from './routes/_authenticated/staff.settings'
-import { Route as AuthenticatedStaffWorkersRouteImport } from './routes/_authenticated/staff.workers'
+import { Route as AuthenticatedStaffRouteImport } from './routes/_authenticated/_staff'
+import { Route as AuthenticatedStaffStaffAnalyticsRouteImport } from './routes/_authenticated/_staff.staff.analytics'
+import { Route as AuthenticatedStaffStaffOrdersRouteImport } from './routes/_authenticated/_staff.staff.orders'
+import { Route as AuthenticatedStaffStaffOverviewRouteImport } from './routes/_authenticated/_staff.staff.overview'
+import { Route as AuthenticatedStaffStaffSettingsRouteImport } from './routes/_authenticated/_staff.staff.settings'
+import { Route as AuthenticatedStaffStaffWorkersRouteImport } from './routes/_authenticated/_staff.staff.workers'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -40,60 +40,59 @@ const StaffRoute = StaffRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedStaffRoute = AuthenticatedStaffRouteImport.update({
-  id: '/staff',
-  path: '/staff',
+  id: '/_staff',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedStaffAnalyticsRoute =
-  AuthenticatedStaffAnalyticsRouteImport.update({
-    id: '/analytics',
-    path: '/analytics',
+const AuthenticatedStaffStaffAnalyticsRoute =
+  AuthenticatedStaffStaffAnalyticsRouteImport.update({
+    id: '/staff/analytics',
+    path: '/staff/analytics',
     getParentRoute: () => AuthenticatedStaffRoute,
   } as any)
-const AuthenticatedStaffOrdersRoute =
-  AuthenticatedStaffOrdersRouteImport.update({
-    id: '/orders',
-    path: '/orders',
+const AuthenticatedStaffStaffOrdersRoute =
+  AuthenticatedStaffStaffOrdersRouteImport.update({
+    id: '/staff/orders',
+    path: '/staff/orders',
     getParentRoute: () => AuthenticatedStaffRoute,
   } as any)
-const AuthenticatedStaffOverviewRoute =
-  AuthenticatedStaffOverviewRouteImport.update({
-    id: '/overview',
-    path: '/overview',
+const AuthenticatedStaffStaffOverviewRoute =
+  AuthenticatedStaffStaffOverviewRouteImport.update({
+    id: '/staff/overview',
+    path: '/staff/overview',
     getParentRoute: () => AuthenticatedStaffRoute,
   } as any)
-const AuthenticatedStaffSettingsRoute =
-  AuthenticatedStaffSettingsRouteImport.update({
-    id: '/settings',
-    path: '/settings',
+const AuthenticatedStaffStaffSettingsRoute =
+  AuthenticatedStaffStaffSettingsRouteImport.update({
+    id: '/staff/settings',
+    path: '/staff/settings',
     getParentRoute: () => AuthenticatedStaffRoute,
   } as any)
-const AuthenticatedStaffWorkersRoute =
-  AuthenticatedStaffWorkersRouteImport.update({
-    id: '/workers',
-    path: '/workers',
+const AuthenticatedStaffStaffWorkersRoute =
+  AuthenticatedStaffStaffWorkersRouteImport.update({
+    id: '/staff/workers',
+    path: '/staff/workers',
     getParentRoute: () => AuthenticatedStaffRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
-  '/staff': typeof AuthenticatedStaffRouteWithChildren
-  '/staff/analytics': typeof AuthenticatedStaffAnalyticsRoute
-  '/staff/orders': typeof AuthenticatedStaffOrdersRoute
-  '/staff/overview': typeof AuthenticatedStaffOverviewRoute
-  '/staff/settings': typeof AuthenticatedStaffSettingsRoute
-  '/staff/workers': typeof AuthenticatedStaffWorkersRoute
+  '/staff': typeof StaffRoute
+  '/staff/analytics': typeof AuthenticatedStaffStaffAnalyticsRoute
+  '/staff/orders': typeof AuthenticatedStaffStaffOrdersRoute
+  '/staff/overview': typeof AuthenticatedStaffStaffOverviewRoute
+  '/staff/settings': typeof AuthenticatedStaffStaffSettingsRoute
+  '/staff/workers': typeof AuthenticatedStaffStaffWorkersRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
-  '/staff': typeof AuthenticatedStaffRouteWithChildren
-  '/staff/analytics': typeof AuthenticatedStaffAnalyticsRoute
-  '/staff/orders': typeof AuthenticatedStaffOrdersRoute
-  '/staff/overview': typeof AuthenticatedStaffOverviewRoute
-  '/staff/settings': typeof AuthenticatedStaffSettingsRoute
-  '/staff/workers': typeof AuthenticatedStaffWorkersRoute
+  '/staff': typeof StaffRoute
+  '/staff/analytics': typeof AuthenticatedStaffStaffAnalyticsRoute
+  '/staff/orders': typeof AuthenticatedStaffStaffOrdersRoute
+  '/staff/overview': typeof AuthenticatedStaffStaffOverviewRoute
+  '/staff/settings': typeof AuthenticatedStaffStaffSettingsRoute
+  '/staff/workers': typeof AuthenticatedStaffStaffWorkersRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -101,12 +100,12 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/staff': typeof StaffRoute
-  '/_authenticated/staff': typeof AuthenticatedStaffRouteWithChildren
-  '/_authenticated/staff/analytics': typeof AuthenticatedStaffAnalyticsRoute
-  '/_authenticated/staff/orders': typeof AuthenticatedStaffOrdersRoute
-  '/_authenticated/staff/overview': typeof AuthenticatedStaffOverviewRoute
-  '/_authenticated/staff/settings': typeof AuthenticatedStaffSettingsRoute
-  '/_authenticated/staff/workers': typeof AuthenticatedStaffWorkersRoute
+  '/_authenticated/_staff': typeof AuthenticatedStaffRouteWithChildren
+  '/_authenticated/_staff/staff/analytics': typeof AuthenticatedStaffStaffAnalyticsRoute
+  '/_authenticated/_staff/staff/orders': typeof AuthenticatedStaffStaffOrdersRoute
+  '/_authenticated/_staff/staff/overview': typeof AuthenticatedStaffStaffOverviewRoute
+  '/_authenticated/_staff/staff/settings': typeof AuthenticatedStaffStaffSettingsRoute
+  '/_authenticated/_staff/staff/workers': typeof AuthenticatedStaffStaffWorkersRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -135,12 +134,12 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/auth'
     | '/staff'
-    | '/_authenticated/staff'
-    | '/_authenticated/staff/analytics'
-    | '/_authenticated/staff/orders'
-    | '/_authenticated/staff/overview'
-    | '/_authenticated/staff/settings'
-    | '/_authenticated/staff/workers'
+    | '/_authenticated/_staff'
+    | '/_authenticated/_staff/staff/analytics'
+    | '/_authenticated/_staff/staff/orders'
+    | '/_authenticated/_staff/staff/overview'
+    | '/_authenticated/_staff/staff/settings'
+    | '/_authenticated/_staff/staff/workers'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -180,65 +179,65 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof StaffRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/staff': {
-      id: '/_authenticated/staff'
-      path: '/staff'
-      fullPath: '/staff'
+    '/_authenticated/_staff': {
+      id: '/_authenticated/_staff'
+      path: ''
+      fullPath: '/'
       preLoaderRoute: typeof AuthenticatedStaffRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/staff/analytics': {
-      id: '/_authenticated/staff/analytics'
-      path: '/analytics'
+    '/_authenticated/_staff/staff/analytics': {
+      id: '/_authenticated/_staff/staff/analytics'
+      path: '/staff/analytics'
       fullPath: '/staff/analytics'
-      preLoaderRoute: typeof AuthenticatedStaffAnalyticsRouteImport
+      preLoaderRoute: typeof AuthenticatedStaffStaffAnalyticsRouteImport
       parentRoute: typeof AuthenticatedStaffRoute
     }
-    '/_authenticated/staff/orders': {
-      id: '/_authenticated/staff/orders'
-      path: '/orders'
+    '/_authenticated/_staff/staff/orders': {
+      id: '/_authenticated/_staff/staff/orders'
+      path: '/staff/orders'
       fullPath: '/staff/orders'
-      preLoaderRoute: typeof AuthenticatedStaffOrdersRouteImport
+      preLoaderRoute: typeof AuthenticatedStaffStaffOrdersRouteImport
       parentRoute: typeof AuthenticatedStaffRoute
     }
-    '/_authenticated/staff/overview': {
-      id: '/_authenticated/staff/overview'
-      path: '/overview'
+    '/_authenticated/_staff/staff/overview': {
+      id: '/_authenticated/_staff/staff/overview'
+      path: '/staff/overview'
       fullPath: '/staff/overview'
-      preLoaderRoute: typeof AuthenticatedStaffOverviewRouteImport
+      preLoaderRoute: typeof AuthenticatedStaffStaffOverviewRouteImport
       parentRoute: typeof AuthenticatedStaffRoute
     }
-    '/_authenticated/staff/settings': {
-      id: '/_authenticated/staff/settings'
-      path: '/settings'
+    '/_authenticated/_staff/staff/settings': {
+      id: '/_authenticated/_staff/staff/settings'
+      path: '/staff/settings'
       fullPath: '/staff/settings'
-      preLoaderRoute: typeof AuthenticatedStaffSettingsRouteImport
+      preLoaderRoute: typeof AuthenticatedStaffStaffSettingsRouteImport
       parentRoute: typeof AuthenticatedStaffRoute
     }
-    '/_authenticated/staff/workers': {
-      id: '/_authenticated/staff/workers'
-      path: '/workers'
+    '/_authenticated/_staff/staff/workers': {
+      id: '/_authenticated/_staff/staff/workers'
+      path: '/staff/workers'
       fullPath: '/staff/workers'
-      preLoaderRoute: typeof AuthenticatedStaffWorkersRouteImport
+      preLoaderRoute: typeof AuthenticatedStaffStaffWorkersRouteImport
       parentRoute: typeof AuthenticatedStaffRoute
     }
   }
 }
 
 interface AuthenticatedStaffRouteChildren {
-  AuthenticatedStaffAnalyticsRoute: typeof AuthenticatedStaffAnalyticsRoute
-  AuthenticatedStaffOrdersRoute: typeof AuthenticatedStaffOrdersRoute
-  AuthenticatedStaffOverviewRoute: typeof AuthenticatedStaffOverviewRoute
-  AuthenticatedStaffSettingsRoute: typeof AuthenticatedStaffSettingsRoute
-  AuthenticatedStaffWorkersRoute: typeof AuthenticatedStaffWorkersRoute
+  AuthenticatedStaffStaffAnalyticsRoute: typeof AuthenticatedStaffStaffAnalyticsRoute
+  AuthenticatedStaffStaffOrdersRoute: typeof AuthenticatedStaffStaffOrdersRoute
+  AuthenticatedStaffStaffOverviewRoute: typeof AuthenticatedStaffStaffOverviewRoute
+  AuthenticatedStaffStaffSettingsRoute: typeof AuthenticatedStaffStaffSettingsRoute
+  AuthenticatedStaffStaffWorkersRoute: typeof AuthenticatedStaffStaffWorkersRoute
 }
 
 const AuthenticatedStaffRouteChildren: AuthenticatedStaffRouteChildren = {
-  AuthenticatedStaffAnalyticsRoute: AuthenticatedStaffAnalyticsRoute,
-  AuthenticatedStaffOrdersRoute: AuthenticatedStaffOrdersRoute,
-  AuthenticatedStaffOverviewRoute: AuthenticatedStaffOverviewRoute,
-  AuthenticatedStaffSettingsRoute: AuthenticatedStaffSettingsRoute,
-  AuthenticatedStaffWorkersRoute: AuthenticatedStaffWorkersRoute,
+  AuthenticatedStaffStaffAnalyticsRoute: AuthenticatedStaffStaffAnalyticsRoute,
+  AuthenticatedStaffStaffOrdersRoute: AuthenticatedStaffStaffOrdersRoute,
+  AuthenticatedStaffStaffOverviewRoute: AuthenticatedStaffStaffOverviewRoute,
+  AuthenticatedStaffStaffSettingsRoute: AuthenticatedStaffStaffSettingsRoute,
+  AuthenticatedStaffStaffWorkersRoute: AuthenticatedStaffStaffWorkersRoute,
 }
 
 const AuthenticatedStaffRouteWithChildren =

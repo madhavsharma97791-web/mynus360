@@ -23,7 +23,7 @@ export function StaffLayout() {
     window.addEventListener("online", focus);
     return () => { void supabase.removeChannel(channel); window.removeEventListener("online", focus); };
   }, [qc]);
-  useEffect(() => { if (sound && alarm) return startStaffAlarm(); }, [sound, alarm]);
+  useEffect(() => { if (sound && alarm) return startStaffAlarm(); return undefined; }, [sound, alarm]);
   const links = data.owner ? [
     { to: "/staff/overview" as const, label: "Overview", Icon: BarChart3 },
     { to: "/staff/orders" as const, label: "All Orders", Icon: ClipboardList },

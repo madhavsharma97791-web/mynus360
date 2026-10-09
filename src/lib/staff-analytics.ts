@@ -4,11 +4,14 @@ import { orderLines } from "./staff-queries";
 export const localDate = (value: string | Date) => new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Kolkata", year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date(value));
 export const localTime = (value: string) => new Intl.DateTimeFormat("en-IN", { timeZone: "Asia/Kolkata", hour: "2-digit", minute: "2-digit" }).format(new Date(value));
 export function periodBounds(date: string, period: "daily" | "weekly" | "monthly") {
-  const start = new Date(`${date}T00:00:00+05:30`);
+  const start = new Date(`${period === "monthly" ? date.slice(0, 7) + "-01" : date}T00:00:00+05:30`);
   if (period === "weekly") start.setUTCDate(start.getUTCDate() - (new Date(`${date}T12:00:00Z`).getUTCDay() + 6) % 7);
-  if (period === "monthly") { const day = Number(date.slice(-2)); start.setUTCDate(start.getUTCDate() - day + 1); }
   const end = new Date(start);
-  if (period === "monthly") end.setUTCMonth(end.getUTCMonth() + 1);
+  if (period === "monthly") {
+    const next = new Date(`${date.slice(0, 7)}-01T12:00:00Z`);
+    next.setUTCMonth(next.getUTCMonth() + 1);
+    end.setTime(new Date(`${next.toISOString().slice(0, 10)}T00:00:00+05:30`).getTime());
+  }
   else end.setUTCDate(end.getUTCDate() + (period === "weekly" ? 7 : 1));
   return { start, end };
 }
