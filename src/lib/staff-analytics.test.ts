@@ -1,3 +1,4 @@
+/// <reference types="bun" />
 import { describe, expect, it } from "bun:test";
 import { analytics, localDate, periodBounds } from "./staff-analytics";
 import type { StaffOrder } from "./staff-order";
