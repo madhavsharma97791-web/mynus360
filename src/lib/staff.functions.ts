@@ -48,7 +48,7 @@ export const setWorkerActive = createServerFn({ method: "POST" })
     if (error) return { ok: false as const, error: error.message };
     const auth = await supabaseAdmin.auth.admin.updateUserById(data.id, { ban_duration: data.active ? "none" : "876000h" });
     if (auth.error) return { ok: false as const, error: "Staff access updated, but the sign-in restriction could not be updated. Please retry." };
-    return error ? { ok: false as const, error: error.message } : { ok: true as const };
+    return { ok: true as const };
   });
 
 export const resetWorkerPassword = createServerFn({ method: "POST" })

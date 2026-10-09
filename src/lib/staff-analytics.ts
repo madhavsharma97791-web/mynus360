@@ -1,5 +1,4 @@
-import type { StaffOrder } from "./staff-queries";
-import { orderLines } from "./staff-queries";
+import { orderLines, type StaffOrder } from "./staff-order";
 
 export const localDate = (value: string | Date) => new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Kolkata", year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date(value));
 export const localTime = (value: string) => new Intl.DateTimeFormat("en-IN", { timeZone: "Asia/Kolkata", hour: "2-digit", minute: "2-digit" }).format(new Date(value));
