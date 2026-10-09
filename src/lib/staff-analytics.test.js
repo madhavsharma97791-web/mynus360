@@ -1,9 +1,7 @@
-/// <reference types="bun" />
 import { describe, expect, it } from "bun:test";
 import { analytics, localDate, periodBounds } from "./staff-analytics";
-import type { StaffOrder } from "./staff-order";
 
-const order = (status: string, total: number, created_at = "2026-10-09T08:00:00Z"): StaffOrder => ({
+const order = (status, total, created_at = "2026-10-09T08:00:00Z") => ({
   id: "test", order_number: 1, client_ref: null, order_type: "Takeaway", table_no: null,
   customer_name: null, customer_phone: null, notes: null,
   lines: [{ name: "Test item", size: "", qty: 2, price: total / 2 }], subtotal: total, total,
