@@ -14,16 +14,255 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      app_settings: {
+        Row: {
+          id: number
+          owner_email: string | null
+          store_name: string
+          updated_at: string
+        }
+        Insert: {
+          id?: number
+          owner_email?: string | null
+          store_name?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: number
+          owner_email?: string | null
+          store_name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      order_events: {
+        Row: {
+          actor: string | null
+          actor_name: string | null
+          created_at: string
+          from_status: string | null
+          id: number
+          note: string | null
+          order_id: string
+          to_status: string
+        }
+        Insert: {
+          actor?: string | null
+          actor_name?: string | null
+          created_at?: string
+          from_status?: string | null
+          id?: number
+          note?: string | null
+          order_id: string
+          to_status: string
+        }
+        Update: {
+          actor?: string | null
+          actor_name?: string | null
+          created_at?: string
+          from_status?: string | null
+          id?: number
+          note?: string | null
+          order_id?: string
+          to_status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_events_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      orders: {
+        Row: {
+          accepted_at: string | null
+          accepted_by: string | null
+          accepted_by_name: string | null
+          acknowledged_at: string | null
+          cancel_reason: string | null
+          cancelled_at: string | null
+          cancelled_by: string | null
+          cancelled_by_name: string | null
+          client_ref: string | null
+          completed_at: string | null
+          completed_by: string | null
+          completed_by_name: string | null
+          created_at: string
+          customer_name: string | null
+          customer_phone: string | null
+          id: string
+          lines: Json
+          notes: string | null
+          order_number: number
+          order_type: string
+          payment_method: string
+          payment_status: string
+          ready_at: string | null
+          status: string
+          subtotal: number
+          table_no: string | null
+          total: number
+        }
+        Insert: {
+          accepted_at?: string | null
+          accepted_by?: string | null
+          accepted_by_name?: string | null
+          acknowledged_at?: string | null
+          cancel_reason?: string | null
+          cancelled_at?: string | null
+          cancelled_by?: string | null
+          cancelled_by_name?: string | null
+          client_ref?: string | null
+          completed_at?: string | null
+          completed_by?: string | null
+          completed_by_name?: string | null
+          created_at?: string
+          customer_name?: string | null
+          customer_phone?: string | null
+          id?: string
+          lines: Json
+          notes?: string | null
+          order_number?: number
+          order_type: string
+          payment_method: string
+          payment_status?: string
+          ready_at?: string | null
+          status?: string
+          subtotal: number
+          table_no?: string | null
+          total: number
+        }
+        Update: {
+          accepted_at?: string | null
+          accepted_by?: string | null
+          accepted_by_name?: string | null
+          acknowledged_at?: string | null
+          cancel_reason?: string | null
+          cancelled_at?: string | null
+          cancelled_by?: string | null
+          cancelled_by_name?: string | null
+          client_ref?: string | null
+          completed_at?: string | null
+          completed_by?: string | null
+          completed_by_name?: string | null
+          created_at?: string
+          customer_name?: string | null
+          customer_phone?: string | null
+          id?: string
+          lines?: Json
+          notes?: string | null
+          order_number?: number
+          order_type?: string
+          payment_method?: string
+          payment_status?: string
+          ready_at?: string | null
+          status?: string
+          subtotal?: number
+          table_no?: string | null
+          total?: number
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          active: boolean
+          created_at: string
+          email: string
+          full_name: string
+          id: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          email?: string
+          full_name?: string
+          id: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          email?: string
+          full_name?: string
+          id?: string
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      claim_owner: { Args: never; Returns: boolean }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
+      is_active_staff: { Args: { _user_id: string }; Returns: boolean }
+      transition_order: {
+        Args: { p_order: string; p_reason?: string; p_to: string }
+        Returns: {
+          accepted_at: string | null
+          accepted_by: string | null
+          accepted_by_name: string | null
+          acknowledged_at: string | null
+          cancel_reason: string | null
+          cancelled_at: string | null
+          cancelled_by: string | null
+          cancelled_by_name: string | null
+          client_ref: string | null
+          completed_at: string | null
+          completed_by: string | null
+          completed_by_name: string | null
+          created_at: string
+          customer_name: string | null
+          customer_phone: string | null
+          id: string
+          lines: Json
+          notes: string | null
+          order_number: number
+          order_type: string
+          payment_method: string
+          payment_status: string
+          ready_at: string | null
+          status: string
+          subtotal: number
+          table_no: string | null
+          total: number
+        }
+        SetofOptions: {
+          from: "*"
+          to: "orders"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "owner" | "worker"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +389,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["owner", "worker"],
+    },
   },
 } as const
