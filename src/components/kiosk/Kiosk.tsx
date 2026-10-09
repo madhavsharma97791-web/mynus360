@@ -1,27 +1,18 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { ArrowLeft, ArrowRight, Check, Minus, Plus, Printer, Search, ShoppingBag, Trash2, X } from "lucide-react";
 import { CATEGORIES, LOGO_URL, MENU, STORE_URL, fromPrice, rupee, type Category, type MenuItem } from "@/lib/menu";
 import { OWNER_WHATSAPP, orderText, type CartLine, type NotifyResult, type Order } from "@/lib/order-types";
 import { notifyOwner } from "@/lib/notify.functions";
-import { unlockAudio } from "@/lib/sound";
+import { placeOrder as submitOrder } from "@/lib/orders.functions";
 
 type Step = "welcome" | "menu" | "review" | "type" | "details" | "payment" | "done";
-const CART_KEY = "m360-cart";
-const COUNTER_KEY = "m360-order-counter";
-const ORDERS_KEY = "m360-orders";
-
-/** Next unique order number, persisted so numbers are never reused on this kiosk. */
-function nextOrderNumber() {
-  const n = Number(localStorage.getItem(COUNTER_KEY) || "1000") + 1;
-  localStorage.setItem(COUNTER_KEY, String(n));
-  return `M360-${n}`;
-}
 
 export function Kiosk() {
   const [step, setStep] = useState<Step>("welcome");
   const [cart, setCart] = useState<CartLine[]>([]);
-  const [hydrated, setHydrated] = useState(false);
+  const clientRef = useRef<string | null>(null);
+  const [placeError, setPlaceError] = useState("");
   const [orderType, setOrderType] = useState<Order["type"] | null>(null);
   const [table, setTable] = useState("");
   const [name, setName] = useState("");
@@ -31,12 +22,7 @@ export function Kiosk() {
   const [notify, setNotify] = useState<NotifyResult | null>(null);
   const [placing, setPlacing] = useState(false);
   const sendNotify = useServerFn(notifyOwner);
-
-  useEffect(() => {
-    try { setCart(JSON.parse(localStorage.getItem(CART_KEY) || "[]")); } catch { /* ignore */ }
-    setHydrated(true);
-  }, []);
-  useEffect(() => { if (hydrated) localStorage.setItem(CART_KEY, JSON.stringify(cart)); }, [cart, hydrated]);
+  const sendOrder = useServerFn(submitOrder);
 
   const subtotal = cart.reduce((s, l) => s + l.price * l.qty, 0);
   const count = cart.reduce((s, l) => s + l.qty, 0);
@@ -52,29 +38,39 @@ export function Kiosk() {
   const remove = (key: string) => setCart((c) => c.filter((l) => l.key !== key));
 
   const reset = () => {
+    clientRef.current = null; setPlaceError("");
     setCart([]); setOrderType(null); setTable(""); setName(""); setPhone("");
     setPayment(null); setOrder(null); setNotify(null); setStep("welcome");
   };
 
   const placeOrder = async () => {
-    if (!orderType || !payment || !cart.length) return;
-    setPlacing(true);
+    if (!orderType || !payment || !cart.length || placing) return;
+    setPlacing(true); setPlaceError("");
+    clientRef.current ??= crypto.randomUUID();
+    try {
+    const result = await sendOrder({ data: {
+      clientRef: clientRef.current, type: orderType, payment,
+      ...(orderType === "Dine In" ? { table } : {}),
+      customerName: name, customerPhone: phone,
+      lines: cart.map(({ itemId, size, qty }) => ({ itemId, size, qty })),
+    } });
+    if (!result.ok) { setPlaceError(result.error); return; }
     const o: Order = {
-      number: nextOrderNumber(), type: orderType, table: orderType === "Dine In" ? table : undefined,
+      number: result.number, type: orderType, table: orderType === "Dine In" ? table : undefined,
       customerName: name.trim() || undefined, customerPhone: phone.trim() || undefined,
-      lines: cart, subtotal, total: subtotal, payment, createdAt: new Date().toISOString(),
+      lines: cart, subtotal: result.total, total: result.total, payment, createdAt: new Date().toISOString(),
     };
-    const history = JSON.parse(localStorage.getItem(ORDERS_KEY) || "[]");
-    localStorage.setItem(ORDERS_KEY, JSON.stringify([o, ...history].slice(0, 200)));
     let res: NotifyResult;
     try { res = await sendNotify({ data: o }); }
     catch (e) { res = { email: "failed", whatsapp: "failed", errors: [String(e)] }; }
     setOrder(o); setNotify(res); setPlacing(false);
     setStep("done");
+    } catch { setPlaceError("Could not send your order. Please try again."); }
+    finally { setPlacing(false); }
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground select-none" onPointerDown={unlockAudio}>
+    <div className="min-h-screen bg-background text-foreground select-none">
       {step === "welcome" && <Welcome onStart={() => setStep("menu")} />}
       {step === "menu" && (
         <MenuScreen cart={cart} subtotal={subtotal} count={count} onAdd={add} onQty={changeQty}
@@ -134,6 +130,7 @@ export function Kiosk() {
               <p className="text-xl">Please pay by UPI at the counter. Staff will confirm your payment.</p>
             </div>
           )}
+          {placeError && <p role="alert" className="mt-4 text-center text-destructive">{placeError}</p>}
           <BigButton disabled={!payment || placing} onClick={placeOrder}>{placing ? "Placing order…" : <>Place Order <Check className="size-8" /></>}</BigButton>
         </Shell>
       )}
