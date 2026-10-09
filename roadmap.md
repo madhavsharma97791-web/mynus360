@@ -1,5 +1,7 @@
 # Roadmap
 
+- [ ] Add ID-only worker sign-in and provision one random worker account securely
+
 - [x] Favicon from owner's logo + tab title "Mynus 360"
 - [x] Explain staff access: preview /staff; the published site is not updated yet
 - [x] Shared server-validated customer orders, staff sign-in and order screens, management-only repeated alarm, owner reports, worker management and settings
