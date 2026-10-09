@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { LOGO_URL } from "@/lib/menu";
+import { workerLoginEmail } from "@/lib/staff-login-id";
 
 export function StaffLogin() {
   const navigate = useNavigate();
@@ -19,7 +20,8 @@ export function StaffLogin() {
       <form className="space-y-5" onSubmit={async e => {
         e.preventDefault(); setBusy(true); setError("");
         try {
-          const result = await supabase.auth.signInWithPassword({ email: email.trim(), password });
+          const loginEmail = role === "worker" && !email.includes("@") ? workerLoginEmail(email) : email.trim();
+          const result = await supabase.auth.signInWithPassword({ email: loginEmail, password });
           if (result.error) throw result.error;
           if (!result.data.user) throw new Error("Sign in failed.");
           await supabase.rpc("claim_owner");
@@ -32,7 +34,7 @@ export function StaffLogin() {
         } catch (err) { setError(err instanceof Error ? err.message : "Could not sign in."); }
         finally { setBusy(false); }
       }}>
-        <label className="block font-semibold">Email<Input className="mt-2 h-12 bg-card" type="email" autoComplete="username" required value={email} onChange={e => setEmail(e.target.value)} /></label>
+        <label className="block font-semibold">{role === "worker" ? "Staff ID or email" : "Email"}<Input className="mt-2 h-12 bg-card" type={role === "worker" ? "text" : "email"} autoComplete="username" autoCapitalize="none" spellCheck={false} required value={email} onChange={e => setEmail(e.target.value)} /></label>
         <label className="block font-semibold">Password<Input className="mt-2 h-12 bg-card" type="password" autoComplete="current-password" required value={password} onChange={e => setPassword(e.target.value)} /></label>
         {error && <p role="alert" className="text-destructive">{error}</p>}
         <Button className="w-full h-12 text-base font-bold" disabled={busy}>{busy ? "Signing in…" : "Sign in"}</Button>
