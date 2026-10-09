@@ -168,6 +168,23 @@
 .alert-pop { animation: alert-in .5s ease-out both; }
 
 .receipt { display: none; }
+.staff-theme {
+  --background: oklch(0.97 0.003 90);
+  --foreground: oklch(0.22 0.01 70);
+  --card: oklch(1 0 0);
+  --card-foreground: var(--foreground);
+  --primary: oklch(0.86 0.17 92);
+  --primary-foreground: oklch(0.18 0.01 70);
+  --secondary: oklch(0.92 0.005 90);
+  --secondary-foreground: var(--foreground);
+  --muted: var(--secondary);
+  --muted-foreground: oklch(0.48 0.01 70);
+  --border: oklch(0.87 0.005 90);
+  --input: var(--border);
+  --radius: 0.5rem;
+  --chart-1: oklch(0.72 0.16 85);
+}
+@media (prefers-reduced-motion: reduce) { .btn-order, .alert-pop, .animate-pulse { animation: none; } }
 @media print {
   body * { visibility: hidden; }
   .receipt, .receipt * { visibility: visible; }
