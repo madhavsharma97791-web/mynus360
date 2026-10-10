@@ -1,4 +1,5 @@
 import { useMemo, useRef, useState } from "react";
+import { Button } from "@/components/ui/button";
 import { useServerFn } from "@tanstack/react-start";
 import { ArrowLeft, ArrowRight, Check, Minus, Plus, Printer, Search, ShoppingBag, Trash2, X } from "lucide-react";
 import { CATEGORIES, LOGO_URL, MENU, STORE_URL, fromPrice, rupee, type Category, type MenuItem } from "@/lib/menu";
@@ -143,15 +144,15 @@ export function Kiosk() {
 /* ---------------- Welcome ---------------- */
 function Welcome({ onStart }: { onStart: () => void }) {
   return (
-    <button onClick={onStart} className="relative flex min-h-screen w-full flex-col items-center justify-center overflow-hidden text-center">
+    <Button variant="ghost" onClick={onStart} className="kiosk-welcome relative flex min-h-svh h-auto w-full flex-col items-center justify-center overflow-hidden whitespace-normal rounded-none py-8 text-center">
       <img src={STORE_URL} alt="" className="absolute inset-0 size-full object-cover opacity-35 blur-[2px] scale-105" />
       <div className="absolute inset-0 bg-gradient-to-b from-background/70 via-background/40 to-background" />
       <div className="relative flex flex-col items-center px-6">
-        <img src={LOGO_URL} alt="MYNUS 360 official logo" className="size-56 rounded-full object-contain sm:size-72" style={{ aspectRatio: "1 / 1" }} />
+        <img src={LOGO_URL} alt="MYNUS 360 official logo" className="size-40 rounded-full object-contain sm:size-72" />
         <p className="mt-6 font-marker text-3xl text-foreground sm:text-4xl">Welcome to</p>
-        <h1 className="font-display text-7xl uppercase leading-none tracking-wide text-primary drop-shadow-[0_4px_0_var(--color-primary-foreground)] sm:text-9xl">Mynus 360</h1>
-        <p className="mt-4 text-2xl font-extrabold tracking-[0.3em] text-foreground sm:text-3xl">GOOD FOOD <span className="text-accent">•</span> GREAT MOOD</p>
-        <span className="btn-order mt-12 inline-flex items-center gap-4 rounded-full border-4 border-primary-foreground bg-primary px-14 py-7 font-display text-5xl uppercase text-primary-foreground transition-transform sm:text-6xl">
+        <h1 className="font-display text-5xl uppercase leading-none text-primary drop-shadow-[0_4px_0_var(--color-primary-foreground)] sm:text-9xl">Mynus 360</h1>
+        <p className="mt-4 text-lg font-extrabold text-foreground sm:text-3xl">GOOD FOOD <span className="text-accent">•</span> GREAT MOOD</p>
+        <span className="btn-order mt-8 inline-flex items-center gap-3 rounded-full border-4 border-primary-foreground bg-primary px-6 py-5 font-display text-3xl uppercase text-primary-foreground transition-transform sm:px-14 sm:text-6xl">
           Order Here <ArrowRight className="size-12" strokeWidth={3} />
         </span>
         <p className="mt-8 animate-pulse text-xl font-bold uppercase tracking-[0.25em] text-muted-foreground">Tap to start your order</p>
@@ -188,8 +189,8 @@ function MenuScreen(props: {
   };
 
   return (
-    <div className="flex h-screen flex-col lg:flex-row">
-      <div className="flex min-w-0 flex-1 flex-col">
+    <div className="flex h-dvh flex-col lg:flex-row">
+      <div className="flex min-h-0 min-w-0 flex-1 flex-col">
         <header className="flex items-center gap-4 border-b border-border bg-card/60 px-4 py-3 sm:px-6">
           <button onClick={props.onHome} aria-label="Back to welcome screen" className="shrink-0">
             <img src={LOGO_URL} alt="MYNUS 360" className="size-16 rounded-full object-contain sm:size-20" />
@@ -197,7 +198,7 @@ function MenuScreen(props: {
           <div className="relative flex-1">
             <Search className="pointer-events-none absolute left-5 top-1/2 size-7 -translate-y-1/2 text-muted-foreground" />
             <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search pizza, momos, shakes…"
-              className="h-16 w-full rounded-full border-2 border-border bg-background pl-16 pr-14 text-xl outline-none focus:border-primary" />
+              className="h-12 sm:h-16 w-full min-w-0 rounded-full border-2 border-border bg-background pl-14 pr-10 text-base sm:text-xl outline-none focus:border-primary" />
             {q && <button onClick={() => setQ("")} aria-label="Clear search" className="absolute right-4 top-1/2 -translate-y-1/2 p-2"><X className="size-6" /></button>}
           </div>
         </header>
@@ -271,8 +272,8 @@ function FoodCard({ item, onOpen }: { item: MenuItem; onOpen: () => void }) {
         {item.note && <span className="text-base text-muted-foreground">{item.note}</span>}
         {sized && <span className="text-sm text-muted-foreground">{item.sizes.map((s) => s.label).join(" / ")}</span>}
         <div className="mt-auto flex items-center justify-between pt-3">
-          <span className="font-display text-3xl text-primary">{sized && <span className="mr-1 text-base text-muted-foreground">from</span>}{rupee(fromPrice(item))}</span>
-          <span className="inline-flex h-12 items-center gap-1 rounded-full border-2 border-primary-foreground bg-primary px-5 font-display text-xl uppercase text-primary-foreground"><Plus className="size-5" strokeWidth={3} />Add</span>
+          <span className="font-display text-2xl sm:text-3xl text-primary">{sized && <span className="mr-1 text-sm text-muted-foreground">from</span>}{rupee(fromPrice(item))}</span>
+          <span className="inline-flex size-11 shrink-0 sm:w-auto items-center justify-center gap-1 rounded-full border-2 border-primary-foreground bg-primary sm:px-5 font-display text-xl uppercase text-primary-foreground"><Plus className="size-5" strokeWidth={3} /><span className="hidden sm:inline">Add</span></span>
         </div>
       </div>
     </button>
@@ -282,7 +283,8 @@ function FoodCard({ item, onOpen }: { item: MenuItem; onOpen: () => void }) {
 function ProductModal({ item, onClose, onAdd }: { item: MenuItem; onClose: () => void; onAdd: (i: MenuItem, size: string, price: number, qty: number) => void }) {
   const [sizeIdx, setSizeIdx] = useState(item.sizes.length > 1 ? 1 : 0);
   const [qty, setQty] = useState(1);
-  const size = (item.sizes[sizeIdx] ?? item.sizes[0])!;
+  const size = item.sizes[sizeIdx] ?? item.sizes[0];
+  if (!size) return null;
   return (
     <div className="fixed inset-0 z-40 grid place-items-center bg-background/85 p-4 backdrop-blur" onClick={onClose}>
       <div className="alert-pop flex max-h-[95vh] w-full max-w-2xl flex-col overflow-y-auto rounded-3xl border-2 border-primary bg-card" onClick={(e) => e.stopPropagation()}>
@@ -352,9 +354,9 @@ function CartList({ cart, onQty, onRemove, big }: { cart: CartLine[]; onQty: (k:
         const item = MENU.find((m) => m.id === l.itemId);
         return (
           <li key={l.key} className="flex items-center gap-3 py-4">
-            {item && <FoodImage item={item} className={`${big ? "size-24" : "size-16"} shrink-0 rounded-xl`} />}
+            {item && <FoodImage item={item} className={`${big ? "size-12 sm:size-24" : "size-12 sm:size-16"} shrink-0 rounded-xl`} />}
             <div className="min-w-0 flex-1">
-              <div className={`${big ? "text-2xl" : "text-lg"} font-extrabold leading-tight`}>{l.name}</div>
+              <div className={`${big ? "text-lg sm:text-2xl" : "text-base sm:text-lg"} break-words font-extrabold leading-tight`}>{l.name}</div>
               <div className="text-base text-muted-foreground">{l.size || "Regular"} · {rupee(l.price)}</div>
               <div className="mt-2 flex items-center gap-3">
                 <QtyBtn small onClick={() => onQty(l.key, -1)} label="Decrease"><Minus className="size-5" /></QtyBtn>
@@ -363,7 +365,7 @@ function CartList({ cart, onQty, onRemove, big }: { cart: CartLine[]; onQty: (k:
                 <button onClick={() => onRemove(l.key)} aria-label={`Remove ${l.name}`} className="ml-auto grid size-12 place-items-center rounded-full text-destructive active:bg-destructive/20"><Trash2 className="size-6" /></button>
               </div>
             </div>
-            <div className={`${big ? "text-3xl" : "text-xl"} shrink-0 font-display text-primary`}>{rupee(l.price * l.qty)}</div>
+            <div className={`${big ? "text-xl sm:text-3xl" : "text-lg sm:text-xl"} shrink-0 font-display text-primary`}>{rupee(l.price * l.qty)}</div>
           </li>
         );
       })}
@@ -395,7 +397,7 @@ function Confirmation({ order, notify, onNew }: { order: Order; notify: NotifyRe
       <p className="mt-2 text-2xl">Thank you for ordering from <span className="font-marker text-primary">MYNUS 360</span></p>
       <div className="mt-8 w-full max-w-lg rounded-3xl border-2 border-border bg-card p-8">
         <div className="text-lg uppercase tracking-widest text-muted-foreground">Order Number</div>
-        <div className="font-display text-6xl text-primary">#{order.number}</div>
+        <div className="font-display text-4xl sm:text-6xl break-words text-primary">#{order.number}</div>
         <div className="mt-6 grid grid-cols-2 gap-4 text-left text-xl">
           <div><div className="text-muted-foreground">Order Type</div><div className="font-bold">{order.type}{order.table ? ` · Table ${order.table}` : ""}</div></div>
           <div><div className="text-muted-foreground">Total</div><div className="font-display text-3xl">{rupee(order.total)}</div></div>
@@ -448,12 +450,12 @@ function Receipt({ order }: { order: Order }) {
 /* ---------------- Shared bits ---------------- */
 function Shell({ title, subtitle, onBack, backLabel = "Back", children }: { title: string; subtitle?: string; onBack: () => void; backLabel?: string; children: React.ReactNode }) {
   return (
-    <div className="mx-auto flex min-h-screen max-w-4xl flex-col px-6 py-8">
+    <div className="mx-auto flex min-h-svh max-w-4xl flex-col px-4 sm:px-6 py-6 sm:py-8">
       <div className="mb-8 flex items-center gap-4">
         <button onClick={onBack} className="inline-flex h-14 items-center gap-2 rounded-full border-2 border-border bg-card px-6 text-lg font-bold active:bg-secondary"><ArrowLeft className="size-6" />{backLabel}</button>
         <img src={LOGO_URL} alt="MYNUS 360" className="ml-auto size-16 rounded-full object-contain" />
       </div>
-      <h1 className="font-display text-5xl uppercase leading-tight text-primary sm:text-6xl">{title}</h1>
+      <h1 className="font-display text-4xl break-words uppercase leading-tight text-primary sm:text-6xl">{title}</h1>
       {subtitle && <p className="mt-2 text-xl text-muted-foreground">{subtitle}</p>}
       <div className="mt-8 flex-1">{children}</div>
     </div>
@@ -462,10 +464,10 @@ function Shell({ title, subtitle, onBack, backLabel = "Back", children }: { titl
 
 function BigButton({ children, onClick, disabled }: { children: React.ReactNode; onClick: () => void; disabled?: boolean }) {
   return (
-    <button onClick={onClick} disabled={disabled}
-      className="mt-8 flex h-24 w-full items-center justify-center gap-3 rounded-3xl border-4 border-primary-foreground bg-primary font-display text-4xl uppercase text-primary-foreground shadow-[0_6px_0_var(--color-primary-foreground)] transition active:translate-y-1 active:shadow-none disabled:opacity-40">
+    <Button onClick={onClick} disabled={disabled}
+      className="mt-8 flex min-h-20 h-auto w-full whitespace-normal py-4 items-center justify-center gap-3 rounded-3xl border-4 border-primary-foreground bg-primary font-display text-2xl sm:text-4xl uppercase text-primary-foreground shadow-[0_6px_0_var(--color-primary-foreground)] transition active:translate-y-1 active:shadow-none disabled:opacity-40">
       {children}
-    </button>
+    </Button>
   );
 }
 
@@ -474,7 +476,7 @@ function Choice({ active, onClick, children }: { active: boolean; onClick: () =>
     <button onClick={onClick}
       className={`h-40 rounded-3xl border-4 font-display text-5xl uppercase transition ${active ? "border-primary-foreground bg-primary text-primary-foreground glow" : "border-border bg-card active:bg-secondary"}`}>
       {children}
-    </button>
+    </Button>
   );
 }
 
