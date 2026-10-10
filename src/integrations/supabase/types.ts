@@ -35,6 +35,27 @@ export type Database = {
         }
         Relationships: []
       }
+      menu_overrides: {
+        Row: {
+          available: boolean
+          item_id: string
+          prices: Json
+          updated_at: string
+        }
+        Insert: {
+          available?: boolean
+          item_id: string
+          prices?: Json
+          updated_at?: string
+        }
+        Update: {
+          available?: boolean
+          item_id?: string
+          prices?: Json
+          updated_at?: string
+        }
+        Relationships: []
+      }
       order_events: {
         Row: {
           actor: string | null
