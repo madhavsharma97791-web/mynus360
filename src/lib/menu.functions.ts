@@ -5,16 +5,9 @@ import { applyMenuOverrides } from "./menu-catalog";
 import { MENU } from "./menu";
 
 export const publicMenu = createServerFn({ method: "GET" }).handler(async () => {
-  const { createClient } = await import("@supabase/supabase-js");
-  const url = process.env["SUPABASE_URL"];
-  const key = process.env["SUPABASE_PUBLISHABLE_KEY"];
-  if (!url || !key) throw new Error("Menu is temporarily unavailable.");
-  const client = createClient(url, key, { auth: { persistSession: false, autoRefreshToken: false }, global: { fetch: (input, init) => {
-    const headers = new Headers(init?.headers);
-    if (key.startsWith("sb_") && headers.get("Authorization") === `Bearer ${key}`) headers.delete("Authorization");
-    headers.set("apikey", key); return fetch(input, { ...init, headers });
-  } } });
-  const result = await client.from("menu_overrides").select("item_id,available,prices");
+  // Server-only read of non-sensitive catalog columns; direct table access is owner-only.
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  const result = await supabaseAdmin.from("menu_overrides").select("item_id,available,prices");
   if (result.error) throw new Error("Menu is temporarily unavailable.");
   return applyMenuOverrides(result.data ?? []);
 });
