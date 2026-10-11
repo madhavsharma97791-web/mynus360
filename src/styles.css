@@ -198,3 +198,27 @@
   .receipt, .receipt * { visibility: visible; }
   .receipt { display: block; position: absolute; inset: 0; width: 80mm; padding: 4mm; background: white; color: black; font-family: monospace; font-size: 12px; }
 }
+.menu-theme {
+  --background: oklch(0.985 0.012 90);
+  --foreground: oklch(0.17 0.01 60);
+  --card: oklch(1 0 0);
+  --card-foreground: var(--foreground);
+  --popover: oklch(1 0 0);
+  --popover-foreground: var(--foreground);
+  --primary: oklch(0.87 0.17 92);
+  --primary-foreground: oklch(0.17 0.01 60);
+  --secondary: oklch(0.95 0.03 90);
+  --secondary-foreground: var(--foreground);
+  --muted: oklch(0.95 0.02 90);
+  --muted-foreground: oklch(0.45 0.02 60);
+  --accent: oklch(0.68 0.19 45);
+  --accent-foreground: oklch(1 0 0);
+  --border: oklch(0.91 0.02 85);
+  --input: var(--border);
+  --ring: oklch(0.87 0.17 92);
+  --radius: 1rem;
+  --glow: 0 8px 24px -12px oklch(0.4 0.05 60 / 0.25);
+  --font-display: "Nunito", sans-serif;
+  font-family: "Nunito Sans", sans-serif;
+}
+.menu-theme .font-display { font-family: "Nunito", sans-serif; font-weight: 900; letter-spacing: 0; }

@@ -43,6 +43,13 @@
       "when": 1791695614177,
       "tag": "0005_verified_owner_activation",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1791733420846,
+      "tag": "0006_restrict_menu_overrides_reads",
+      "breakpoints": true
     }
   ]
 }
