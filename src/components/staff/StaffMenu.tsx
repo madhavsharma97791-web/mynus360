@@ -17,7 +17,10 @@ export function StaffMenu() {
     })}</div></>;
 }
 function MenuEditor({item,available,prices}:{item:MenuItem;available:boolean;prices:unknown}) {
-  const [enabled,setEnabled]=useState(available);const [values,setValues]=useState<Record<string,number>>(()=>Object.fromEntries(item.sizes.map(s=>[s.label, prices && typeof prices==="object" && !Array.isArray(prices) && typeof (prices as Record<string,unknown>)[s.label]==="number" ? (prices as Record<string,number>)[s.label] : s.price])));
+  const [enabled,setEnabled]=useState(available);const [values,setValues]=useState<Record<string,number>>(()=>Object.fromEntries(item.sizes.map(s=>{
+    const value = prices && typeof prices==="object" && !Array.isArray(prices) ? (prices as Record<string,unknown>)[s.label] : undefined;
+    return [s.label, typeof value === "number" ? value : s.price];
+  })));
   const [busy,setBusy]=useState(false);const [message,setMessage]=useState("");const save=useServerFn(saveMenuItem);const qc=useQueryClient();
   return <form className="border rounded-lg bg-card p-4" onSubmit={async e=>{
     e.preventDefault();setBusy(true);setMessage("");
