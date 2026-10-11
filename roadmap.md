@@ -11,3 +11,5 @@
 - [ ] Verify owner reports end-to-end — blocked by owner setup; worker ID sign-in is verified
 - [ ] Audit and verify customer-to-worker order visibility, retries, refresh and status changes with a real test order
 - [ ] Publish the completed staff system — waiting for owner setup and signed-in verification
+- [x] Premium black/gold restyle of kiosk (colours, type, spacing) keeping all menu and ordering logic
+- [x] Explain ZIP source export without GitHub (paid plan: Download codebase)

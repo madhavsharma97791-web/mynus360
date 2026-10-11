@@ -60,34 +60,34 @@
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-veg: var(--veg);
-  --font-display: "Anton", sans-serif;
-  --font-marker: "Permanent Marker", cursive;
-  --font-sans: "Barlow", sans-serif;
+  --font-display: "Cormorant Garamond", serif;
+  --font-marker: "Cormorant Garamond", serif;
+  --font-sans: "Manrope", sans-serif;
 }
 
 :root {
-  --radius: 1.25rem;
-  --background: oklch(0.14 0.008 70);
+  --radius: 0.5rem;
+  --background: oklch(0.13 0.004 75);
   --foreground: oklch(0.97 0.01 90);
-  --card: oklch(0.2 0.01 70);
+  --card: oklch(0.18 0.005 75);
   --card-foreground: oklch(0.97 0.01 90);
   --popover: oklch(0.2 0.01 70);
   --popover-foreground: oklch(0.97 0.01 90);
-  --primary: oklch(0.86 0.17 92);
+  --primary: oklch(0.8 0.12 85);
   --primary-foreground: oklch(0.13 0.01 70);
   --secondary: oklch(0.27 0.012 70);
   --secondary-foreground: oklch(0.97 0.01 90);
   --muted: oklch(0.25 0.01 70);
   --muted-foreground: oklch(0.72 0.02 85);
-  --accent: oklch(0.66 0.21 38);
+  --accent: oklch(0.72 0.13 70);
   --accent-foreground: oklch(0.99 0 0);
   --destructive: oklch(0.6 0.22 27);
   --destructive-foreground: oklch(0.99 0 0);
   --veg: oklch(0.62 0.17 145);
-  --border: oklch(0.32 0.015 70);
-  --input: oklch(0.32 0.015 70);
-  --ring: oklch(0.86 0.17 92);
-  --glow: 0 0 40px oklch(0.86 0.17 92 / 0.45);
+  --border: oklch(0.28 0.008 75);
+  --input: oklch(0.28 0.008 75);
+  --ring: oklch(0.8 0.12 85);
+  --glow: 0 10px 30px -12px oklch(0.8 0.12 85 / 0.35);
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
@@ -150,6 +150,7 @@
 }
 
 @layer base {
+  h1,h2,h3,.font-display { letter-spacing: 0.01em; font-weight: 600; }
   html, body { font-family: var(--font-sans); -webkit-tap-highlight-color: transparent; overscroll-behavior: none; }
   button { touch-action: manipulation; cursor: pointer; }
 }
@@ -158,8 +159,8 @@
 @utility no-scrollbar { scrollbar-width: none; &::-webkit-scrollbar { display: none; } }
 
 @keyframes pulse-glow {
-  0%, 100% { box-shadow: 0 8px 0 var(--primary-foreground), 0 0 30px oklch(0.86 0.17 92 / 0.4); }
-  50% { box-shadow: 0 8px 0 var(--primary-foreground), 0 0 70px oklch(0.86 0.17 92 / 0.8); }
+  0%, 100% { box-shadow: 0 8px 0 var(--primary-foreground), 0 0 18px oklch(0.8 0.12 85 / 0.2); }
+  50% { box-shadow: 0 8px 0 var(--primary-foreground), 0 0 32px oklch(0.8 0.12 85 / 0.35); }
 }
 .btn-order { animation: pulse-glow 2.2s ease-in-out infinite; }
 .btn-order:active { transform: translateY(6px); box-shadow: 0 2px 0 var(--primary-foreground); animation: none; }
