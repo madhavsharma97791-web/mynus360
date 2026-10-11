@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Outlet, Link } from "@tanstack/react-router";
 import { useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
-import { BellRing, ClipboardList, BarChart3, Users, Settings, LogOut, Volume2 } from "lucide-react";
+import { BellRing, ClipboardList, BarChart3, Users, Settings, LogOut, Volume2, UtensilsCrossed } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { LOGO_URL, rupee } from "@/lib/menu";
@@ -27,20 +27,21 @@ export function StaffLayout() {
   const links = data.owner ? [
     { to: "/staff/overview" as const, label: "Overview", Icon: BarChart3 },
     { to: "/staff/orders" as const, label: "All Orders", Icon: ClipboardList },
+    { to: "/staff/menu" as const, label: "Menu", Icon: UtensilsCrossed },
     { to: "/staff/analytics" as const, label: "Analytics", Icon: BarChart3 },
     { to: "/staff/workers" as const, label: "Workers", Icon: Users },
     { to: "/staff/settings" as const, label: "Settings", Icon: Settings },
   ] : [{ to: "/staff/orders" as const, label: "Orders", Icon: ClipboardList }];
   return <div className="staff-theme min-h-screen bg-background text-foreground">
     <header className="flex items-center gap-3 border-b bg-card px-4 py-3 md:px-8">
-      <img src={LOGO_URL} alt="" className="size-12 object-contain" /><span className="font-display text-2xl">MYNUS 360</span>
+      <img src={LOGO_URL} alt="" className="size-10 sm:size-12 object-contain" /><span className="font-display text-lg sm:text-2xl">MYNUS 360</span>
       <span className="ml-auto text-sm text-muted-foreground" role="status">{connected}</span>
       <Button variant={sound ? "default" : "outline"} onClick={() => setSound(v => !v)} aria-pressed={sound} title="Order alarm"><Volume2 /><span className="hidden sm:inline">{sound ? "Sound on" : "Enable sound"}</span></Button>
       <Button variant="ghost" size="icon" title="Sign out" onClick={() => void supabase.auth.signOut()}><LogOut /></Button>
     </header>
     <div className="md:grid md:grid-cols-[200px_1fr]">
       <nav className="fixed bottom-0 inset-x-0 z-20 flex justify-around border-t bg-card md:static md:flex-col md:justify-start md:border-t-0 md:border-r md:p-4 md:gap-2" aria-label="Staff navigation">
-        {links.map(({ to, label, Icon }) => <Link key={to} to={to} className="flex flex-col md:flex-row items-center gap-1 md:gap-3 px-2 py-3 text-xs md:text-base" activeProps={{ className: "bg-primary text-primary-foreground rounded-md font-bold" }}><Icon className="size-5" />{label}</Link>)}
+        {links.map(({ to, label, Icon }) => <Link key={to} to={to} className="min-w-0 flex flex-1 md:flex-none flex-col md:flex-row items-center gap-1 md:gap-3 px-1 md:px-2 py-3 text-[10px] sm:text-xs md:text-base text-center" activeProps={{ className: "bg-primary text-primary-foreground rounded-md font-bold" }}><Icon className="size-5 shrink-0" />{label}</Link>)}
         <div className="hidden md:block mt-8 text-sm text-muted-foreground">{data.profile.full_name || data.profile.email}<br />{data.owner ? "Owner" : "Worker"}</div>
       </nav>
       <main className="min-w-0 px-4 py-6 pb-28 md:p-8">

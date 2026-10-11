@@ -9,7 +9,7 @@ import { placeOrder as submitOrder } from "@/lib/orders.functions";
 
 type Step = "welcome" | "menu" | "review" | "type" | "details" | "payment" | "done";
 
-export function Kiosk() {
+export function Kiosk({ menu }: { menu: MenuItem[] }) {
   const [step, setStep] = useState<Step>("welcome");
   const [cart, setCart] = useState<CartLine[]>([]);
   const clientRef = useRef<string | null>(null);
@@ -74,7 +74,7 @@ export function Kiosk() {
     <div className="min-h-screen bg-background text-foreground select-none">
       {step === "welcome" && <Welcome onStart={() => setStep("menu")} />}
       {step === "menu" && (
-        <MenuScreen cart={cart} subtotal={subtotal} count={count} onAdd={add} onQty={changeQty}
+        <MenuScreen menu={menu} cart={cart} subtotal={subtotal} count={count} onAdd={add} onQty={changeQty}
           onRemove={remove} onProceed={() => setStep("review")} onHome={() => setStep("welcome")} />
       )}
       {step === "review" && (
@@ -158,12 +158,13 @@ function Welcome({ onStart }: { onStart: () => void }) {
         <p className="mt-8 animate-pulse text-xl font-bold uppercase tracking-[0.25em] text-muted-foreground">Tap to start your order</p>
         <p className="mt-10 text-base text-muted-foreground">Mitha Bazar, Jalandhar</p>
       </div>
-    </button>
+    </Button>
   );
 }
 
 /* ---------------- Menu ---------------- */
 function MenuScreen(props: {
+  menu: MenuItem[];
   cart: CartLine[]; subtotal: number; count: number;
   onAdd: (i: MenuItem, size: string, price: number, qty: number) => void;
   onQty: (k: string, d: number) => void; onRemove: (k: string) => void;
@@ -177,9 +178,9 @@ function MenuScreen(props: {
 
   const items = useMemo(() => {
     const t = q.trim().toLowerCase();
-    return MENU.filter((i) => (cat === "All" || i.category === cat) &&
+    return props.menu.filter((i) => (cat === "All" || i.category === cat) &&
       (!t || `${i.name} ${i.category} ${i.group ?? ""} ${i.note ?? ""}`.toLowerCase().includes(t)));
-  }, [cat, q]);
+  }, [cat, q, props.menu]);
 
   const handleAdd = (i: MenuItem, size: string, price: number, qty: number) => {
     props.onAdd(i, size, price, qty);
@@ -473,8 +474,8 @@ function BigButton({ children, onClick, disabled }: { children: React.ReactNode;
 
 function Choice({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) {
   return (
-    <button onClick={onClick}
-      className={`h-40 rounded-3xl border-4 font-display text-5xl uppercase transition ${active ? "border-primary-foreground bg-primary text-primary-foreground glow" : "border-border bg-card active:bg-secondary"}`}>
+    <Button onClick={onClick}
+      className={`h-28 sm:h-40 whitespace-normal rounded-3xl border-4 font-display text-3xl sm:text-5xl uppercase transition ${active ? "border-primary-foreground bg-primary text-primary-foreground glow" : "border-border bg-card active:bg-secondary"}`}>
       {children}
     </Button>
   );
