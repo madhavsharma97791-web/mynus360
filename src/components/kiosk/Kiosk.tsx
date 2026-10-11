@@ -189,32 +189,55 @@ function MenuScreen(props: {
     setTimeout(() => setFlash(null), 1600);
   };
 
+  const qtyOf = (i: MenuItem) => props.cart.filter((l) => l.itemId === i.id).reduce((s, l) => s + l.qty, 0);
+  const quickAdd = (i: MenuItem) => {
+    const s = i.sizes[0];
+    if (i.sizes.length > 1 || !s) { setOpen(i); return; }
+    props.onAdd(i, s.label, s.price, 1);
+  };
+  const quickMinus = (i: MenuItem) => props.onQty(`${i.id}|${i.sizes[0]?.label ?? ""}`, -1);
+  const thumb = (c: Category) => props.menu.find((i) => i.category === c && i.image)?.image;
+  const pick = (c: Category | "All") => { setCat(c); document.getElementById("menu-grid")?.scrollTo({ top: 0, behavior: "smooth" }); };
+
   return (
     <div className="flex h-dvh flex-col lg:flex-row">
       <div className="flex min-h-0 min-w-0 flex-1 flex-col">
-        <header className="flex items-center gap-4 border-b border-border bg-card/60 px-4 py-3 sm:px-6">
+        <header className="flex items-center gap-3 border-b border-border bg-card/60 px-3 py-2 sm:px-6">
           <button onClick={props.onHome} aria-label="Back to welcome screen" className="shrink-0">
-            <img src={LOGO_URL} alt="MYNUS 360" className="size-16 rounded-full object-contain sm:size-20" />
+            <img src={LOGO_URL} alt="MYNUS 360" className="size-11 rounded-full object-contain sm:size-14" />
           </button>
-          <div className="relative flex-1">
-            <Search className="pointer-events-none absolute left-5 top-1/2 size-7 -translate-y-1/2 text-muted-foreground" />
+          <div className="relative min-w-0 flex-1">
+            <Search className="pointer-events-none absolute left-4 top-1/2 size-5 -translate-y-1/2 text-muted-foreground" />
             <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search pizza, momos, shakes…"
-              className="h-12 sm:h-16 w-full min-w-0 rounded-full border-2 border-border bg-background pl-14 pr-10 text-base sm:text-xl outline-none focus:border-primary" />
-            {q && <button onClick={() => setQ("")} aria-label="Clear search" className="absolute right-4 top-1/2 -translate-y-1/2 p-2"><X className="size-6" /></button>}
+              className="h-11 sm:h-12 w-full min-w-0 rounded-full border border-border bg-background pl-11 pr-10 text-base outline-none focus:border-primary" />
+            {q && <button onClick={() => setQ("")} aria-label="Clear search" className="absolute right-2 top-1/2 -translate-y-1/2 p-2"><X className="size-5" /></button>}
           </div>
         </header>
-        <nav className="no-scrollbar flex gap-3 overflow-x-auto border-b border-border px-4 py-3 sm:px-6">
+        <nav aria-label="Categories" className="no-scrollbar flex gap-2 overflow-x-auto border-b border-border px-3 py-2 sm:px-6">
           {(["All", ...CATEGORIES] as const).map((c) => (
-            <button key={c} onClick={() => setCat(c)}
-              className={`shrink-0 rounded-full border-2 px-6 py-3 font-display text-xl uppercase tracking-wide transition ${cat === c ? "border-primary-foreground bg-primary text-primary-foreground glow" : "border-border bg-card text-foreground active:bg-secondary"}`}>{c}</button>
+            <button key={c} onClick={() => pick(c)} aria-pressed={cat === c}
+              className={`shrink-0 rounded-md border px-3.5 py-2 text-sm font-semibold transition ${cat === c ? "border-primary bg-primary text-primary-foreground" : "border-border bg-card text-muted-foreground hover:text-foreground active:bg-secondary"}`}>{c}</button>
           ))}
         </nav>
-        <main className="flex-1 overflow-y-auto px-4 pb-32 pt-6 sm:px-6 lg:pb-8">
+        <div className="no-scrollbar flex gap-3 overflow-x-auto border-b border-border px-3 py-2.5 sm:px-6">
+          {CATEGORIES.map((c) => {
+            const src = thumb(c);
+            return (
+              <button key={c} onClick={() => pick(c)} className="group flex w-16 shrink-0 flex-col items-center gap-1 sm:w-20">
+                <span className={`block size-12 overflow-hidden rounded-full border-2 transition sm:size-14 ${cat === c ? "border-primary" : "border-border group-hover:border-muted-foreground"}`}>
+                  {src ? <img src={src} alt="" loading="lazy" className="size-full object-cover" /> : <span className="grid size-full place-items-center bg-secondary text-xs">{c[0]}</span>}
+                </span>
+                <span className={`w-full truncate text-center text-[11px] font-semibold sm:text-xs ${cat === c ? "text-primary" : "text-muted-foreground"}`}>{c}</span>
+              </button>
+            );
+          })}
+        </div>
+        <main id="menu-grid" className="flex-1 overflow-y-auto px-3 pb-28 pt-4 sm:px-6 lg:pb-8">
           {items.length === 0 ? (
-            <div className="grid h-full place-items-center font-display text-4xl uppercase text-muted-foreground">No items found</div>
+            <div className="grid h-full place-items-center font-display text-3xl text-muted-foreground">No items found</div>
           ) : (
-            <div className="grid grid-cols-2 gap-4 md:grid-cols-3 2xl:grid-cols-4">
-              {items.map((i) => <FoodCard key={i.id} item={i} onOpen={() => setOpen(i)} />)}
+            <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
+              {items.map((i) => <FoodCard key={i.id} item={i} qty={qtyOf(i)} onOpen={() => setOpen(i)} onAdd={() => quickAdd(i)} onMinus={() => quickMinus(i)} />)}
             </div>
           )}
         </main>
@@ -226,9 +249,9 @@ function MenuScreen(props: {
 
       {/* Small screens: sticky cart bar + drawer */}
       <div className="fixed inset-x-0 bottom-0 z-30 border-t border-border bg-card p-3 lg:hidden">
-        <button onClick={() => setDrawer(true)} className="flex h-20 w-full items-center justify-between rounded-2xl bg-primary px-6 text-primary-foreground">
-          <span className="flex items-center gap-3 font-display text-2xl uppercase"><ShoppingBag className="size-8" /> {props.count} items</span>
-          <span className="font-display text-3xl">{rupee(props.subtotal)} →</span>
+        <button onClick={() => setDrawer(true)} className="flex h-14 w-full items-center justify-between rounded-lg bg-primary px-5 text-primary-foreground">
+          <span className="flex items-center gap-2 text-base font-bold"><ShoppingBag className="size-6" /> {props.count} items · View cart</span>
+          <span className="font-display text-2xl">{rupee(props.subtotal)} →</span>
         </button>
       </div>
       {drawer && (
@@ -259,25 +282,36 @@ function VegMark() {
   return <span aria-label="Vegetarian" className="grid size-6 place-items-center rounded-sm border-2 border-veg bg-background"><span className="size-2.5 rounded-full bg-veg" /></span>;
 }
 
-function FoodCard({ item, onOpen }: { item: MenuItem; onOpen: () => void }) {
+function FoodCard({ item, qty, onOpen, onAdd, onMinus }: { item: MenuItem; qty: number; onOpen: () => void; onAdd: () => void; onMinus: () => void }) {
   const sized = item.sizes.length > 1;
   return (
-    <button onClick={onOpen} className="group flex flex-col overflow-hidden rounded-3xl border-2 border-border bg-card text-left transition active:scale-[0.97] active:border-primary">
-      <div className="relative aspect-square overflow-hidden bg-secondary">
+    <div className="flex flex-col overflow-hidden rounded-lg border border-border bg-card transition hover:border-muted-foreground">
+      <button onClick={onOpen} className="relative aspect-[4/3] overflow-hidden bg-secondary" aria-label={`View ${item.name}`}>
         <FoodImage item={item} className="size-full" />
-        <div className="absolute left-3 top-3"><VegMark /></div>
-      </div>
-      <div className="flex flex-1 flex-col gap-1 p-4">
-        {item.group && <span className="text-sm font-bold uppercase tracking-wider text-accent">{item.group}</span>}
-        <h3 className="text-xl font-extrabold leading-tight">{item.name}</h3>
-        {item.note && <span className="text-base text-muted-foreground">{item.note}</span>}
-        {sized && <span className="text-sm text-muted-foreground">{item.sizes.map((s) => s.label).join(" / ")}</span>}
-        <div className="mt-auto flex items-center justify-between pt-3">
-          <span className="font-display text-2xl sm:text-3xl text-primary">{sized && <span className="mr-1 text-sm text-muted-foreground">from</span>}{rupee(fromPrice(item))}</span>
-          <span className="inline-flex size-11 shrink-0 sm:w-auto items-center justify-center gap-1 rounded-full border-2 border-primary-foreground bg-primary sm:px-5 font-display text-xl uppercase text-primary-foreground"><Plus className="size-5" strokeWidth={3} /><span className="hidden sm:inline">Add</span></span>
+        <div className="absolute left-2 top-2"><VegMark /></div>
+      </button>
+      <div className="flex flex-1 flex-col gap-0.5 p-3">
+        <button onClick={onOpen} className="text-left">
+          <h3 className="line-clamp-2 text-base font-bold leading-snug sm:text-lg">{item.name}</h3>
+          {item.note && <span className="text-xs text-muted-foreground">{item.note}</span>}
+          {sized && <span className="block text-xs text-muted-foreground">{item.sizes.map((s) => s.label).join(" / ")}</span>}
+        </button>
+        <div className="mt-auto flex items-center justify-between gap-2 pt-2">
+          <span className="font-display text-xl text-primary sm:text-2xl">{sized && <span className="mr-1 font-sans text-xs text-muted-foreground">from</span>}{rupee(fromPrice(item))}</span>
+          {qty > 0 && !sized ? (
+            <span className="flex shrink-0 items-center rounded-md bg-primary text-primary-foreground">
+              <button onClick={onMinus} aria-label={`Remove one ${item.name}`} className="grid size-10 place-items-center"><Minus className="size-4" strokeWidth={3} /></button>
+              <span className="w-6 text-center font-bold">{qty}</span>
+              <button onClick={onAdd} aria-label={`Add one ${item.name}`} className="grid size-10 place-items-center"><Plus className="size-4" strokeWidth={3} /></button>
+            </span>
+          ) : (
+            <button onClick={onAdd} className="inline-flex h-10 shrink-0 items-center gap-1 rounded-md bg-primary px-3 text-sm font-bold text-primary-foreground active:scale-95">
+              <Plus className="size-4" strokeWidth={3} />Add{sized && qty > 0 ? ` (${qty})` : ""}
+            </button>
+          )}
         </div>
       </div>
-    </button>
+    </div>
   );
 }
 
