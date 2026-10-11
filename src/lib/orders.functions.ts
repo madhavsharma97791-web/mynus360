@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { MENU } from "./menu";
+import { applyMenuOverrides } from "./menu-catalog";
 
 // Public: the kiosk places orders here. Prices and totals are recomputed from the
 // trusted menu on the server; client_ref makes a retried submit idempotent.
@@ -22,20 +22,22 @@ export type PlacedOrder = { ok: true; number: string; total: number } | { ok: fa
 export const placeOrder = createServerFn({ method: "POST" })
   .inputValidator((d) => input.parse(d))
   .handler(async ({ data }): Promise<PlacedOrder> => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const existing = await supabaseAdmin.from("orders").select("order_number,total").eq("client_ref", data.clientRef).maybeSingle();
+    if (existing.error) return { ok: false, error: "Could not check your order. Please try again." };
+    if (existing.data) return { ok: true, number: `M360-${existing.data.order_number}`, total: existing.data.total };
+    const overrides = await supabaseAdmin.from("menu_overrides").select("item_id,available,prices");
+    if (overrides.error) return {ok:false,error:"Could not load current menu prices. Please try again."};
+    const menu = applyMenuOverrides(overrides.data ?? []);
     const lines = [];
     for (const l of data.lines) {
-      const item = MENU.find((m) => m.id === l.itemId);
+      const item = menu.find((m) => m.id === l.itemId);
       const size = item?.sizes.find((s) => s.label === l.size);
       if (!item || !size) return { ok: false, error: "An item in your order is no longer available." };
       lines.push({ itemId: item.id, name: item.name, size: size.label, price: size.price, qty: l.qty });
     }
     if (data.type === "Dine In" && !data.table) return { ok: false, error: "Please choose a table." };
     const subtotal = lines.reduce((s, l) => s + l.price * l.qty, 0);
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-
-    const existing = await supabaseAdmin.from("orders").select("order_number,total").eq("client_ref", data.clientRef).maybeSingle();
-    if (existing.data) return { ok: true, number: `M360-${existing.data.order_number}`, total: existing.data.total };
-
     const { data: row, error } = await supabaseAdmin.from("orders").insert({
       client_ref: data.clientRef,
       order_type: data.type,
