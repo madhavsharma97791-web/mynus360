@@ -16,6 +16,7 @@ import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as StaffRouteImport } from './routes/staff'
 import { Route as AuthenticatedStaffRouteImport } from './routes/_authenticated/_staff'
 import { Route as AuthenticatedStaffStaffAnalyticsRouteImport } from './routes/_authenticated/_staff.staff.analytics'
+import { Route as AuthenticatedStaffStaffMenuRouteImport } from './routes/_authenticated/_staff.staff.menu'
 import { Route as AuthenticatedStaffStaffOrdersRouteImport } from './routes/_authenticated/_staff.staff.orders'
 import { Route as AuthenticatedStaffStaffOverviewRouteImport } from './routes/_authenticated/_staff.staff.overview'
 import { Route as AuthenticatedStaffStaffSettingsRouteImport } from './routes/_authenticated/_staff.staff.settings'
@@ -55,6 +56,12 @@ const AuthenticatedStaffStaffAnalyticsRoute =
     path: '/staff/analytics',
     getParentRoute: () => AuthenticatedStaffRoute,
   } as any)
+const AuthenticatedStaffStaffMenuRoute =
+  AuthenticatedStaffStaffMenuRouteImport.update({
+    id: '/staff/menu',
+    path: '/staff/menu',
+    getParentRoute: () => AuthenticatedStaffRoute,
+  } as any)
 const AuthenticatedStaffStaffOrdersRoute =
   AuthenticatedStaffStaffOrdersRouteImport.update({
     id: '/staff/orders',
@@ -86,6 +93,7 @@ export interface FileRoutesByFullPath {
   '/reset-password': typeof ResetPasswordRoute
   '/staff': typeof StaffRoute
   '/staff/analytics': typeof AuthenticatedStaffStaffAnalyticsRoute
+  '/staff/menu': typeof AuthenticatedStaffStaffMenuRoute
   '/staff/orders': typeof AuthenticatedStaffStaffOrdersRoute
   '/staff/overview': typeof AuthenticatedStaffStaffOverviewRoute
   '/staff/settings': typeof AuthenticatedStaffStaffSettingsRoute
@@ -97,6 +105,7 @@ export interface FileRoutesByTo {
   '/reset-password': typeof ResetPasswordRoute
   '/staff': typeof StaffRoute
   '/staff/analytics': typeof AuthenticatedStaffStaffAnalyticsRoute
+  '/staff/menu': typeof AuthenticatedStaffStaffMenuRoute
   '/staff/orders': typeof AuthenticatedStaffStaffOrdersRoute
   '/staff/overview': typeof AuthenticatedStaffStaffOverviewRoute
   '/staff/settings': typeof AuthenticatedStaffStaffSettingsRoute
@@ -111,6 +120,7 @@ export interface FileRoutesById {
   '/staff': typeof StaffRoute
   '/_authenticated/_staff': typeof AuthenticatedStaffRouteWithChildren
   '/_authenticated/_staff/staff/analytics': typeof AuthenticatedStaffStaffAnalyticsRoute
+  '/_authenticated/_staff/staff/menu': typeof AuthenticatedStaffStaffMenuRoute
   '/_authenticated/_staff/staff/orders': typeof AuthenticatedStaffStaffOrdersRoute
   '/_authenticated/_staff/staff/overview': typeof AuthenticatedStaffStaffOverviewRoute
   '/_authenticated/_staff/staff/settings': typeof AuthenticatedStaffStaffSettingsRoute
@@ -124,6 +134,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/staff'
     | '/staff/analytics'
+    | '/staff/menu'
     | '/staff/orders'
     | '/staff/overview'
     | '/staff/settings'
@@ -135,6 +146,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/staff'
     | '/staff/analytics'
+    | '/staff/menu'
     | '/staff/orders'
     | '/staff/overview'
     | '/staff/settings'
@@ -148,6 +160,7 @@ export interface FileRouteTypes {
     | '/staff'
     | '/_authenticated/_staff'
     | '/_authenticated/_staff/staff/analytics'
+    | '/_authenticated/_staff/staff/menu'
     | '/_authenticated/_staff/staff/orders'
     | '/_authenticated/_staff/staff/overview'
     | '/_authenticated/_staff/staff/settings'
@@ -213,6 +226,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedStaffStaffAnalyticsRouteImport
       parentRoute: typeof AuthenticatedStaffRoute
     }
+    '/_authenticated/_staff/staff/menu': {
+      id: '/_authenticated/_staff/staff/menu'
+      path: '/staff/menu'
+      fullPath: '/staff/menu'
+      preLoaderRoute: typeof AuthenticatedStaffStaffMenuRouteImport
+      parentRoute: typeof AuthenticatedStaffRoute
+    }
     '/_authenticated/_staff/staff/orders': {
       id: '/_authenticated/_staff/staff/orders'
       path: '/staff/orders'
@@ -246,6 +266,7 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedStaffRouteChildren {
   AuthenticatedStaffStaffAnalyticsRoute: typeof AuthenticatedStaffStaffAnalyticsRoute
+  AuthenticatedStaffStaffMenuRoute: typeof AuthenticatedStaffStaffMenuRoute
   AuthenticatedStaffStaffOrdersRoute: typeof AuthenticatedStaffStaffOrdersRoute
   AuthenticatedStaffStaffOverviewRoute: typeof AuthenticatedStaffStaffOverviewRoute
   AuthenticatedStaffStaffSettingsRoute: typeof AuthenticatedStaffStaffSettingsRoute
@@ -254,6 +275,7 @@ interface AuthenticatedStaffRouteChildren {
 
 const AuthenticatedStaffRouteChildren: AuthenticatedStaffRouteChildren = {
   AuthenticatedStaffStaffAnalyticsRoute: AuthenticatedStaffStaffAnalyticsRoute,
+  AuthenticatedStaffStaffMenuRoute: AuthenticatedStaffStaffMenuRoute,
   AuthenticatedStaffStaffOrdersRoute: AuthenticatedStaffStaffOrdersRoute,
   AuthenticatedStaffStaffOverviewRoute: AuthenticatedStaffStaffOverviewRoute,
   AuthenticatedStaffStaffSettingsRoute: AuthenticatedStaffStaffSettingsRoute,
