@@ -249,9 +249,9 @@ function MenuScreen(props: {
 
       {/* Small screens: sticky cart bar + drawer */}
       <div className="fixed inset-x-0 bottom-0 z-30 border-t border-border bg-card p-3 lg:hidden">
-        <button onClick={() => setDrawer(true)} className="flex h-20 w-full items-center justify-between rounded-2xl bg-primary px-6 text-primary-foreground">
-          <span className="flex items-center gap-3 font-display text-2xl uppercase"><ShoppingBag className="size-8" /> {props.count} items</span>
-          <span className="font-display text-3xl">{rupee(props.subtotal)} →</span>
+        <button onClick={() => setDrawer(true)} className="flex h-14 w-full items-center justify-between rounded-lg bg-primary px-5 text-primary-foreground">
+          <span className="flex items-center gap-2 text-base font-bold"><ShoppingBag className="size-6" /> {props.count} items · View cart</span>
+          <span className="font-display text-2xl">{rupee(props.subtotal)} →</span>
         </button>
       </div>
       {drawer && (
