@@ -16,3 +16,5 @@
 - Order status changes use the atomic transition_order RPC and its audit events to prevent competing staff actions.
 - Owner analytics derive from the complete RLS-scoped order set, while realtime invalidation and timed refresh keep staff orders current.
 - ID-only worker authentication uses the shared deterministic synthetic-email mapper and a unique normalized profiles.login_id; accounts are provisioned through privileged Auth administration, never a public signup or client-side credential check.
+- Original menu entries remain immutable defaults; owner-only menu overrides apply to both public catalog reads and server-validated orders, preserving existing order line prices.
+- Owner invitation and recovery use the public password setup page; only verified designated-owner email activation can assign ownership, never user metadata or request parameters.
