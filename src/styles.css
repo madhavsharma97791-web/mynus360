@@ -222,3 +222,12 @@
   font-family: "Nunito Sans", sans-serif;
 }
 .menu-theme .font-display { font-family: "Nunito", sans-serif; font-weight: 900; letter-spacing: 0; }
+.menu-hero {
+  background:
+    radial-gradient(120% 130% at 88% -20%, color-mix(in oklab, var(--primary) 78%, transparent) 0%, transparent 62%),
+    linear-gradient(180deg, color-mix(in oklab, var(--primary) 24%, var(--background)) 0%, var(--background) 78%);
+}
+.menu-brush { background: var(--accent); color: var(--accent-foreground); border-radius: 999px; transform: rotate(-1.5deg); }
+.menu-hero-img { box-shadow: 0 16px 34px -16px oklch(0.35 0.06 60 / 0.45); }
+.menu-panel-head { background: color-mix(in oklab, var(--primary) 42%, var(--card)); color: var(--foreground); }
+.menu-proceed { background: color-mix(in oklab, var(--primary) 55%, var(--card)); color: color-mix(in oklab, var(--foreground) 55%, var(--card)); }

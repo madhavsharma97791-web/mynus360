@@ -353,29 +353,34 @@ function VegMark() {
 
 function FoodCard({ item, qty, onOpen, onAdd, onMinus }: { item: MenuItem; qty: number; onOpen: () => void; onAdd: () => void; onMinus: () => void }) {
   const sized = item.sizes.length > 1;
+  const blurb = MENU_BLURBS[item.id] ?? item.note;
   return (
     <div className="flex flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition hover:shadow-md">
       <button onClick={onOpen} className="relative aspect-[4/3] overflow-hidden bg-secondary" aria-label={`View ${item.name}`}>
         <FoodImage item={item} className="size-full" />
         <div className="absolute left-2 top-2"><VegMark /></div>
+        {item.id === "crispy-veg-burger" && (
+          <span aria-hidden className="absolute right-2 top-2 grid size-9 place-items-center rounded-full bg-primary font-display text-[10px] leading-none text-primary-foreground">360°</span>
+        )}
+        {item.id === "supreme-burger" && <Crown aria-hidden className="absolute right-2 top-2 size-7 text-primary drop-shadow" />}
       </button>
-      <div className="flex flex-1 flex-col gap-0.5 p-3">
+      <div className="flex flex-1 flex-col p-3">
         <button onClick={onOpen} className="text-left">
-          <h3 className="line-clamp-2 text-base font-bold leading-snug sm:text-lg">{item.name}</h3>
-          {item.note && <span className="text-xs text-muted-foreground">{item.note}</span>}
-          {sized && <span className="block text-xs text-muted-foreground">{item.sizes.map((s) => s.label).join(" / ")}</span>}
+          <h3 className="line-clamp-2 text-base font-extrabold leading-snug sm:text-lg">{item.name}</h3>
+          {blurb && <p className="mt-0.5 line-clamp-1 text-xs text-muted-foreground">{blurb}</p>}
+          {sized && <span className="mt-0.5 block text-xs text-muted-foreground">{item.sizes.map((s) => s.label).join(" / ")}</span>}
         </button>
-        <div className="mt-auto flex items-center justify-between gap-2 pt-2">
-          <span className="font-display text-xl text-accent sm:text-2xl">{sized && <span className="mr-1 font-sans text-xs font-normal text-muted-foreground">from</span>}{rupee(fromPrice(item))}</span>
+        <div className="mt-auto flex items-center justify-between gap-2 pt-3">
+          <span className="font-display text-xl text-accent sm:text-2xl">{sized && <span className="mr-1 font-sans text-[11px] font-bold text-muted-foreground">from</span>}{rupee(fromPrice(item))}</span>
           {qty > 0 && !sized ? (
-            <span className="flex shrink-0 items-center rounded-md bg-primary text-primary-foreground">
-              <button onClick={onMinus} aria-label={`Remove one ${item.name}`} className="grid size-10 place-items-center"><Minus className="size-4" strokeWidth={3} /></button>
-              <span className="w-6 text-center font-bold">{qty}</span>
-              <button onClick={onAdd} aria-label={`Add one ${item.name}`} className="grid size-10 place-items-center"><Plus className="size-4" strokeWidth={3} /></button>
+            <span className="flex shrink-0 items-center rounded-lg bg-primary text-primary-foreground">
+              <button onClick={onMinus} aria-label={`Remove one ${item.name}`} className="grid size-9 place-items-center"><Minus className="size-4" strokeWidth={3} /></button>
+              <span className="w-6 text-center text-sm font-extrabold">{qty}</span>
+              <button onClick={onAdd} aria-label={`Add one ${item.name}`} className="grid size-9 place-items-center"><Plus className="size-4" strokeWidth={3} /></button>
             </span>
           ) : (
-            <button onClick={onAdd} className="inline-flex h-10 shrink-0 items-center gap-1 rounded-md bg-primary px-3 text-sm font-bold text-primary-foreground active:scale-95">
-              <Plus className="size-4" strokeWidth={3} />Add{sized && qty > 0 ? ` (${qty})` : ""}
+            <button onClick={onAdd} className="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-lg bg-primary px-3 text-sm font-extrabold text-primary-foreground active:scale-95">
+              <ShoppingCart aria-hidden className="size-4" />Add{sized && qty > 0 ? ` (${qty})` : ""}
             </button>
           )}
         </div>
@@ -430,23 +435,47 @@ function ProductModal({ item, onClose, onAdd }: { item: MenuItem; onClose: () =>
 function CartPanel(p: { cart: CartLine[]; subtotal: number; onQty: (k: string, d: number) => void; onRemove: (k: string) => void; onProceed: () => void; onClose?: () => void }) {
   return (
     <>
-      <div className="flex items-center justify-between border-b border-border px-6 py-5">
-        <h2 className="font-display text-4xl uppercase text-primary">Your Order</h2>
-        {p.onClose && <button onClick={p.onClose} aria-label="Close cart" className="p-2"><X className="size-8" /></button>}
+      <div className="menu-panel-head flex items-center gap-3 px-5 py-4">
+        <ShoppingBag aria-hidden className="size-6 shrink-0" />
+        <h2 className="font-display text-2xl">Your Order</h2>
+        {p.onClose && <button onClick={p.onClose} aria-label="Close cart" className="ml-auto p-1"><X className="size-6" /></button>}
       </div>
       <div className="flex-1 overflow-y-auto px-4 py-3">
         {p.cart.length === 0
-          ? <p className="py-16 text-center text-xl text-muted-foreground">Your cart is empty.<br />Tap a dish to add it.</p>
+          ? (
+            <div className="flex flex-col items-center gap-2 py-14 text-center">
+              <EmptyCartArt />
+              <p className="text-lg font-extrabold">Your cart is empty.</p>
+              <p className="text-sm text-muted-foreground">Tap a dish to add it.</p>
+            </div>
+          )
           : <CartList cart={p.cart} onQty={p.onQty} onRemove={p.onRemove} />}
       </div>
       <div className="border-t border-border p-5">
-        <Totals subtotal={p.subtotal} />
+        <div className="flex justify-between text-base text-muted-foreground"><span>Subtotal</span><span>{rupee(p.subtotal)}</span></div>
+        <div className="mt-1 flex items-center justify-between">
+          <span className="font-display text-xl uppercase">Total</span>
+          <span className="font-display text-3xl text-accent">{rupee(p.subtotal)}</span>
+        </div>
         <button disabled={!p.cart.length} onClick={p.onProceed}
-          className="mt-4 flex h-20 w-full items-center justify-center gap-3 rounded-2xl border-4 border-primary-foreground bg-primary font-display text-3xl uppercase text-primary-foreground transition active:translate-y-1 disabled:opacity-40">
-          Proceed <ArrowRight className="size-8" />
+          className="menu-proceed mt-4 flex h-14 w-full items-center justify-center gap-2 rounded-xl font-display text-xl uppercase tracking-wide transition active:translate-y-0.5 disabled:cursor-not-allowed">
+          Proceed <ArrowRight aria-hidden className="size-5" />
         </button>
       </div>
     </>
+  );
+}
+
+function EmptyCartArt() {
+  return (
+    <svg viewBox="0 0 120 120" aria-hidden className="size-28 text-muted-foreground" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="60" cy="60" r="44" strokeDasharray="3 6" opacity="0.45" />
+      <path d="M38 52c0-9 10-16 22-16s22 7 22 16" />
+      <path d="M36 60h48" />
+      <path d="M36 68h48" />
+      <path d="M38 76c2 6 10 10 22 10s20-4 22-10" />
+      <path d="M60 22v-8M88 32l5-6M32 32l-5-6" opacity="0.4" />
+    </svg>
   );
 }
 
