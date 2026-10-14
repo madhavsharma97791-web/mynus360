@@ -1,11 +1,12 @@
 import { useMemo, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useServerFn } from "@tanstack/react-start";
-import { ArrowLeft, ArrowRight, Check, Clock3, Minus, Plus, Printer, Search, ShoppingBag, Trash2, X } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, ChevronDown, Clock3, Crown, Croissant, CupSoda, Hamburger, IceCream, IceCreamCone, MapPin, Martini, Milk, Minus, Pizza, Plus, Printer, Sandwich, Salad, Search, ShoppingBag, ShoppingCart, Soup, Trash2, UtensilsCrossed, Wheat, X } from "lucide-react";
 import { CATEGORIES, LOGO_URL, MENU, STORE_URL, fromPrice, rupee, type Category, type MenuItem } from "@/lib/menu";
 import { OWNER_WHATSAPP, orderText, type CartLine, type NotifyResult, type Order } from "@/lib/order-types";
 import { notifyOwner } from "@/lib/notify.functions";
 import { placeOrder as submitOrder } from "@/lib/orders.functions";
+import { MENU_BLURBS } from "@/lib/menu-blurbs";
 
 type Step = "welcome" | "menu" | "review" | "type" | "details" | "payment" | "done";
 
@@ -163,6 +164,13 @@ function Welcome({ onStart }: { onStart: () => void }) {
 }
 
 /* ---------------- Menu ---------------- */
+const CAT_ICONS = {
+  Burgers: Hamburger, Sandwiches: Sandwich, Wraps: Croissant, Fries: CupSoda,
+  Pasta: Soup, "Garlic Bread": Wheat, Momos: Salad, Chinese: UtensilsCrossed,
+  Pizza: Pizza, Desserts: IceCreamCone, Mocktails: Martini, Shakes: Milk,
+  "Premium Shakes": Milk,
+} satisfies Record<Category, typeof Hamburger>;
+
 function MenuScreen(props: {
   menu: MenuItem[];
   cart: CartLine[]; subtotal: number; count: number;
@@ -170,7 +178,7 @@ function MenuScreen(props: {
   onQty: (k: string, d: number) => void; onRemove: (k: string) => void;
   onProceed: () => void; onHome: () => void;
 }) {
-  const [cat, setCat] = useState<Category | "All">("All");
+  const [cat, setCat] = useState<Category>("Burgers");
   const [q, setQ] = useState("");
   const [open, setOpen] = useState<MenuItem | null>(null);
   const [drawer, setDrawer] = useState(false);
@@ -178,8 +186,8 @@ function MenuScreen(props: {
 
   const items = useMemo(() => {
     const t = q.trim().toLowerCase();
-    return props.menu.filter((i) => (cat === "All" || i.category === cat) &&
-      (!t || `${i.name} ${i.category} ${i.group ?? ""} ${i.note ?? ""}`.toLowerCase().includes(t)));
+    const pool = t ? props.menu : props.menu.filter((i) => i.category === cat);
+    return pool.filter((i) => !t || `${i.name} ${i.category} ${i.group ?? ""} ${i.note ?? ""}`.toLowerCase().includes(t));
   }, [cat, q, props.menu]);
 
   const handleAdd = (i: MenuItem, size: string, price: number, qty: number) => {
@@ -196,66 +204,105 @@ function MenuScreen(props: {
     props.onAdd(i, s.label, s.price, 1);
   };
   const quickMinus = (i: MenuItem) => props.onQty(`${i.id}|${i.sizes[0]?.label ?? ""}`, -1);
-  const thumb = (c: Category) => props.menu.find((i) => i.category === c && i.image)?.image;
-  const pick = (c: Category | "All") => { setCat(c); document.getElementById("menu-grid")?.scrollTo({ top: 0, behavior: "smooth" }); };
+  const hero = props.menu.find((i) => i.category === cat && i.image)?.image;
+  const pick = (c: Category) => { setCat(c); setQ(""); document.getElementById("menu-grid")?.scrollTo({ top: 0, behavior: "smooth" }); };
 
   return (
-    <div className="menu-theme flex h-dvh flex-col bg-background text-foreground lg:flex-row">
+    <div className="menu-theme flex h-dvh flex-col overflow-hidden bg-background text-foreground lg:flex-row">
+      <aside className="hidden w-60 shrink-0 flex-col bg-foreground text-background lg:flex">
+        <button onClick={props.onHome} aria-label="Back to welcome screen" className="flex flex-col items-center gap-1 px-4 pt-5 pb-4 text-center">
+          <img src={LOGO_URL} alt="MYNUS 360" className="size-20 rounded-full object-contain" />
+          <span className="font-display text-lg leading-none">Mynus 360</span>
+          <span className="text-[11px] font-bold uppercase tracking-[0.14em] opacity-80">Good Food • Great Mood</span>
+          <span className="text-[10px] uppercase tracking-[0.14em] opacity-60">Mitha Bazar, Jalandhar</span>
+        </button>
+        <nav aria-label="Categories" className="no-scrollbar flex-1 overflow-y-auto px-3 pb-4">
+          <ul className="space-y-1">
+            {CATEGORIES.map((c) => {
+              const Icon = CAT_ICONS[c];
+              const on = cat === c;
+              return (
+                <li key={c}>
+                  <button onClick={() => pick(c)} aria-pressed={on}
+                    className={`flex w-full items-center gap-3 rounded-full px-3 py-2 text-left text-sm font-extrabold transition active:scale-[0.98] ${on ? "bg-primary text-primary-foreground" : "hover:bg-background/10"}`}>
+                    <Icon aria-hidden className="size-5 shrink-0" />
+                    <span className="truncate">{c}</span>
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+        </nav>
+      </aside>
+
       <div className="flex min-h-0 min-w-0 flex-1 flex-col">
         <main id="menu-grid" className="flex-1 overflow-y-auto overflow-x-hidden pb-28 lg:pb-8">
-          <header className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-b-[2rem] bg-foreground px-4 py-3 text-background sm:px-6">
-            <button onClick={props.onHome} aria-label="Back to welcome screen" className="flex min-w-0 items-center gap-3 text-left">
-              <img src={LOGO_URL} alt="MYNUS 360" className="size-12 shrink-0 rounded-full object-contain sm:size-14" />
-              <span className="min-w-0">
-                <span className="block truncate font-display text-base text-primary sm:text-lg">GOOD FOOD • GREAT MOOD</span>
-                <span className="block truncate text-xs opacity-75">Mitha Bazar, Jalandhar</span>
-              </span>
-            </button>
-            <div className="flex flex-col items-end gap-2 sm:flex-row sm:items-center">
-              <div role="note" aria-label="Your order preparation time: 15–20 mins" className="flex shrink-0 items-center gap-2 rounded-lg bg-primary px-3 py-2 text-primary-foreground">
-                <Clock3 aria-hidden="true" className="size-6 shrink-0 text-accent" />
-                <span>
-                  <span className="block text-[10px] font-semibold leading-tight">Your order preparation time</span>
-                  <span className="block text-base font-extrabold leading-tight">15–20 mins</span>
-                </span>
-              </div>
-              <button onClick={() => setDrawer(true)} className="inline-flex h-11 shrink-0 items-center gap-2 rounded-full bg-primary px-4 font-bold text-primary-foreground lg:hidden">
-                <ShoppingBag className="size-5" />Cart ({props.count})
+          <section className="menu-hero relative overflow-hidden px-4 pt-4 sm:px-6">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <button onClick={props.onHome} aria-label="Back to welcome screen" className="lg:hidden">
+                <img src={LOGO_URL} alt="MYNUS 360" className="size-11 rounded-full object-contain" />
               </button>
+              <div className="ml-auto flex flex-wrap items-center justify-end gap-2">
+                <div role="note" aria-label="Your order preparation time: 15–20 mins" className="flex items-center gap-2 rounded-xl bg-primary px-3 py-1.5 text-primary-foreground">
+                  <Clock3 aria-hidden className="size-5 shrink-0" />
+                  <span>
+                    <span className="block text-[10px] font-semibold leading-tight">Your order preparation time</span>
+                    <span className="block text-sm font-extrabold leading-tight">15–20 mins</span>
+                  </span>
+                </div>
+                <div className="flex items-center gap-2 rounded-xl border border-border bg-card px-3 py-2 text-xs font-bold sm:text-sm">
+                  <MapPin aria-hidden className="size-4 shrink-0 text-accent" />
+                  <span className="whitespace-nowrap">Mitha Bazar, Jalandhar</span>
+                  <ChevronDown aria-hidden className="size-4 opacity-50" />
+                </div>
+              </div>
             </div>
-          </header>
-          <section className="px-4 pt-5 sm:px-6">
-            <h1 className="font-display text-3xl leading-tight sm:text-5xl">What are you <span className="text-accent">craving</span> today?</h1>
-            <p className="mt-1 text-sm text-muted-foreground sm:text-base">Freshly made favourites, just a tap away!</p>
+
+            <div className="relative mt-5 grid items-center gap-4 sm:grid-cols-[minmax(0,1fr)_auto]">
+              <div className="min-w-0">
+                <span className="menu-brush inline-flex px-4 py-1 text-xs font-black uppercase tracking-wide sm:text-sm">Freshly Made</span>
+                <h1 className="font-display mt-2 text-4xl uppercase leading-[0.95] sm:text-6xl">{cat}</h1>
+                <p className="mt-1 text-sm font-extrabold uppercase tracking-wide sm:text-lg">
+                  {cat === "Burgers" ? "Bigger bites. Happier days." : "Good food. Great mood."}
+                </p>
+              </div>
+              {hero && (
+                <div className="flex items-center justify-center gap-3">
+                  <img src={hero} alt="" aria-hidden className="menu-hero-img size-28 rounded-full object-cover sm:size-40" />
+                  <span className="hidden flex-col items-center text-center sm:flex">
+                    <Crown aria-hidden className="size-7 text-accent" />
+                    <span className="font-display mt-1 text-[11px] uppercase leading-tight">Good Food<br />Great Mood</span>
+                  </span>
+                </div>
+              )}
+            </div>
+
             <div className="relative mt-4">
-              <Search className="pointer-events-none absolute left-4 top-1/2 size-5 -translate-y-1/2 text-muted-foreground" />
-              <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search pizza, momos, shakes..."
+              <Search aria-hidden className="pointer-events-none absolute left-4 top-1/2 size-5 -translate-y-1/2 opacity-60" />
+              <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search for burgers, sandwiches, pizza, fries..."
                 className="h-12 w-full min-w-0 rounded-full border border-border bg-card pl-12 pr-11 text-base shadow-sm outline-none focus:border-primary sm:h-14" />
               {q && <button onClick={() => setQ("")} aria-label="Clear search" className="absolute right-2 top-1/2 -translate-y-1/2 p-2"><X className="size-5" /></button>}
             </div>
           </section>
-          <nav aria-label="Categories" className="no-scrollbar mt-4 flex gap-2.5 overflow-x-auto px-4 pb-2 sm:px-6">
-            {(["All", ...CATEGORIES] as const).map((c) => {
-              const src = c === "All" ? undefined : thumb(c);
+
+          <nav aria-label="Categories" className="no-scrollbar mt-4 flex gap-2 overflow-x-auto px-4 lg:hidden">
+            {CATEGORIES.map((c) => {
+              const Icon = CAT_ICONS[c];
               const on = cat === c;
               return (
                 <button key={c} onClick={() => pick(c)} aria-pressed={on}
-                  className={`flex w-[5.5rem] shrink-0 flex-col items-center gap-1.5 rounded-2xl border p-2 shadow-sm transition active:scale-95 sm:w-24 ${on ? "border-primary bg-primary" : "border-border bg-card hover:border-primary"}`}>
-                  <span className="block size-14 overflow-hidden rounded-xl bg-secondary">
-                    {src ? <img src={src} alt="" loading="lazy" className="size-full object-cover" /> : <span className="grid size-full place-items-center font-display text-lg">All</span>}
-                  </span>
-                  <span className="w-full truncate text-center text-xs font-bold">{c}</span>
+                  className={`flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-2 text-xs font-extrabold transition active:scale-95 ${on ? "border-primary bg-primary text-primary-foreground" : "border-border bg-card"}`}>
+                  <Icon aria-hidden className="size-4" />{c}
                 </button>
               );
             })}
           </nav>
+
           <section className="px-4 pt-4 sm:px-6">
-            <h2 className="font-display text-2xl sm:text-3xl">{cat === "All" ? "Your Favourites" : cat}</h2>
-            <p className="mb-3 text-sm text-muted-foreground">Good food. Great mood.</p>
             {items.length === 0 ? (
               <div className="grid place-items-center gap-3 rounded-2xl border border-border bg-card py-16 text-center">
                 <p className="font-display text-2xl">No dishes match</p>
-                <button onClick={() => { setQ(""); setCat("All"); }} className="rounded-full bg-primary px-5 py-2 font-bold text-primary-foreground">Show all dishes</button>
+                <button onClick={() => { setQ(""); setCat("Burgers"); }} className="rounded-full bg-primary px-5 py-2 font-bold text-primary-foreground">Show all dishes</button>
               </div>
             ) : (
               <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
@@ -266,11 +313,10 @@ function MenuScreen(props: {
         </main>
       </div>
 
-      <aside className="hidden w-[400px] shrink-0 flex-col border-l border-border bg-card lg:flex">
+      <aside className="hidden w-[360px] shrink-0 flex-col border-l border-border bg-card lg:flex">
         <CartPanel {...props} />
       </aside>
 
-      {/* Small screens: sticky cart bar + drawer */}
       <div className="fixed inset-x-0 bottom-0 z-30 border-t border-border bg-card p-3 lg:hidden">
         <button onClick={() => setDrawer(true)} className="flex h-14 w-full items-center justify-between rounded-lg bg-primary px-5 text-primary-foreground">
           <span className="flex items-center gap-2 text-base font-bold"><ShoppingBag className="size-6" /> {props.count} items · View cart</span>
@@ -307,29 +353,34 @@ function VegMark() {
 
 function FoodCard({ item, qty, onOpen, onAdd, onMinus }: { item: MenuItem; qty: number; onOpen: () => void; onAdd: () => void; onMinus: () => void }) {
   const sized = item.sizes.length > 1;
+  const blurb = MENU_BLURBS[item.id] ?? item.note;
   return (
     <div className="flex flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition hover:shadow-md">
       <button onClick={onOpen} className="relative aspect-[4/3] overflow-hidden bg-secondary" aria-label={`View ${item.name}`}>
         <FoodImage item={item} className="size-full" />
         <div className="absolute left-2 top-2"><VegMark /></div>
+        {item.id === "crispy-veg-burger" && (
+          <span aria-hidden className="absolute right-2 top-2 grid size-9 place-items-center rounded-full bg-primary font-display text-[10px] leading-none text-primary-foreground">360°</span>
+        )}
+        {item.id === "supreme-burger" && <Crown aria-hidden className="absolute right-2 top-2 size-7 text-primary drop-shadow" />}
       </button>
-      <div className="flex flex-1 flex-col gap-0.5 p-3">
+      <div className="flex flex-1 flex-col p-3">
         <button onClick={onOpen} className="text-left">
-          <h3 className="line-clamp-2 text-base font-bold leading-snug sm:text-lg">{item.name}</h3>
-          {item.note && <span className="text-xs text-muted-foreground">{item.note}</span>}
-          {sized && <span className="block text-xs text-muted-foreground">{item.sizes.map((s) => s.label).join(" / ")}</span>}
+          <h3 className="line-clamp-2 text-base font-extrabold leading-snug sm:text-lg">{item.name}</h3>
+          {blurb && <p className="mt-0.5 line-clamp-1 text-xs text-muted-foreground">{blurb}</p>}
+          {sized && <span className="mt-0.5 block text-xs text-muted-foreground">{item.sizes.map((s) => s.label).join(" / ")}</span>}
         </button>
-        <div className="mt-auto flex items-center justify-between gap-2 pt-2">
-          <span className="font-display text-xl text-accent sm:text-2xl">{sized && <span className="mr-1 font-sans text-xs font-normal text-muted-foreground">from</span>}{rupee(fromPrice(item))}</span>
+        <div className="mt-auto flex items-center justify-between gap-2 pt-3">
+          <span className="font-display text-xl text-accent sm:text-2xl">{sized && <span className="mr-1 font-sans text-[11px] font-bold text-muted-foreground">from</span>}{rupee(fromPrice(item))}</span>
           {qty > 0 && !sized ? (
-            <span className="flex shrink-0 items-center rounded-md bg-primary text-primary-foreground">
-              <button onClick={onMinus} aria-label={`Remove one ${item.name}`} className="grid size-10 place-items-center"><Minus className="size-4" strokeWidth={3} /></button>
-              <span className="w-6 text-center font-bold">{qty}</span>
-              <button onClick={onAdd} aria-label={`Add one ${item.name}`} className="grid size-10 place-items-center"><Plus className="size-4" strokeWidth={3} /></button>
+            <span className="flex shrink-0 items-center rounded-lg bg-primary text-primary-foreground">
+              <button onClick={onMinus} aria-label={`Remove one ${item.name}`} className="grid size-9 place-items-center"><Minus className="size-4" strokeWidth={3} /></button>
+              <span className="w-6 text-center text-sm font-extrabold">{qty}</span>
+              <button onClick={onAdd} aria-label={`Add one ${item.name}`} className="grid size-9 place-items-center"><Plus className="size-4" strokeWidth={3} /></button>
             </span>
           ) : (
-            <button onClick={onAdd} className="inline-flex h-10 shrink-0 items-center gap-1 rounded-md bg-primary px-3 text-sm font-bold text-primary-foreground active:scale-95">
-              <Plus className="size-4" strokeWidth={3} />Add{sized && qty > 0 ? ` (${qty})` : ""}
+            <button onClick={onAdd} className="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-lg bg-primary px-3 text-sm font-extrabold text-primary-foreground active:scale-95">
+              <ShoppingCart aria-hidden className="size-4" />Add{sized && qty > 0 ? ` (${qty})` : ""}
             </button>
           )}
         </div>
@@ -384,23 +435,47 @@ function ProductModal({ item, onClose, onAdd }: { item: MenuItem; onClose: () =>
 function CartPanel(p: { cart: CartLine[]; subtotal: number; onQty: (k: string, d: number) => void; onRemove: (k: string) => void; onProceed: () => void; onClose?: () => void }) {
   return (
     <>
-      <div className="flex items-center justify-between border-b border-border px-6 py-5">
-        <h2 className="font-display text-4xl uppercase text-primary">Your Order</h2>
-        {p.onClose && <button onClick={p.onClose} aria-label="Close cart" className="p-2"><X className="size-8" /></button>}
+      <div className="menu-panel-head flex items-center gap-3 px-5 py-4">
+        <ShoppingBag aria-hidden className="size-6 shrink-0" />
+        <h2 className="font-display text-2xl">Your Order</h2>
+        {p.onClose && <button onClick={p.onClose} aria-label="Close cart" className="ml-auto p-1"><X className="size-6" /></button>}
       </div>
       <div className="flex-1 overflow-y-auto px-4 py-3">
         {p.cart.length === 0
-          ? <p className="py-16 text-center text-xl text-muted-foreground">Your cart is empty.<br />Tap a dish to add it.</p>
+          ? (
+            <div className="flex flex-col items-center gap-2 py-14 text-center">
+              <EmptyCartArt />
+              <p className="text-lg font-extrabold">Your cart is empty.</p>
+              <p className="text-sm text-muted-foreground">Tap a dish to add it.</p>
+            </div>
+          )
           : <CartList cart={p.cart} onQty={p.onQty} onRemove={p.onRemove} />}
       </div>
       <div className="border-t border-border p-5">
-        <Totals subtotal={p.subtotal} />
+        <div className="flex justify-between text-base text-muted-foreground"><span>Subtotal</span><span>{rupee(p.subtotal)}</span></div>
+        <div className="mt-1 flex items-center justify-between">
+          <span className="font-display text-xl uppercase">Total</span>
+          <span className="font-display text-3xl text-accent">{rupee(p.subtotal)}</span>
+        </div>
         <button disabled={!p.cart.length} onClick={p.onProceed}
-          className="mt-4 flex h-20 w-full items-center justify-center gap-3 rounded-2xl border-4 border-primary-foreground bg-primary font-display text-3xl uppercase text-primary-foreground transition active:translate-y-1 disabled:opacity-40">
-          Proceed <ArrowRight className="size-8" />
+          className="menu-proceed mt-4 flex h-14 w-full items-center justify-center gap-2 rounded-xl font-display text-xl uppercase tracking-wide transition active:translate-y-0.5 disabled:cursor-not-allowed">
+          Proceed <ArrowRight aria-hidden className="size-5" />
         </button>
       </div>
     </>
+  );
+}
+
+function EmptyCartArt() {
+  return (
+    <svg viewBox="0 0 120 120" aria-hidden className="size-28 text-muted-foreground" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="60" cy="60" r="44" strokeDasharray="3 6" opacity="0.45" />
+      <path d="M38 52c0-9 10-16 22-16s22 7 22 16" />
+      <path d="M36 60h48" />
+      <path d="M36 68h48" />
+      <path d="M38 76c2 6 10 10 22 10s20-4 22-10" />
+      <path d="M60 22v-8M88 32l5-6M32 32l-5-6" opacity="0.4" />
+    </svg>
   );
 }
 
