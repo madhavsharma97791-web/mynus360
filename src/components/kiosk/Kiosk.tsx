@@ -1,7 +1,7 @@
 import { useMemo, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useServerFn } from "@tanstack/react-start";
-import { ArrowLeft, ArrowRight, Check, Minus, Plus, Printer, Search, ShoppingBag, Trash2, X } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, Clock3, Minus, Plus, Printer, Search, ShoppingBag, Trash2, X } from "lucide-react";
 import { CATEGORIES, LOGO_URL, MENU, STORE_URL, fromPrice, rupee, type Category, type MenuItem } from "@/lib/menu";
 import { OWNER_WHATSAPP, orderText, type CartLine, type NotifyResult, type Order } from "@/lib/order-types";
 import { notifyOwner } from "@/lib/notify.functions";
@@ -211,9 +211,18 @@ function MenuScreen(props: {
                 <span className="block truncate text-xs opacity-75">Mitha Bazar, Jalandhar</span>
               </span>
             </button>
-            <button onClick={() => setDrawer(true)} className="inline-flex h-11 shrink-0 items-center gap-2 rounded-full bg-primary px-4 font-bold text-primary-foreground lg:hidden">
-              <ShoppingBag className="size-5" />Cart ({props.count})
-            </button>
+            <div className="flex flex-col items-end gap-2 sm:flex-row sm:items-center">
+              <div role="note" aria-label="Your order preparation time: 15–20 mins" className="flex shrink-0 items-center gap-2 rounded-lg bg-primary px-3 py-2 text-primary-foreground">
+                <Clock3 aria-hidden="true" className="size-6 shrink-0 text-accent" />
+                <span>
+                  <span className="block text-[10px] font-semibold leading-tight">Your order preparation time</span>
+                  <span className="block text-base font-extrabold leading-tight">15–20 mins</span>
+                </span>
+              </div>
+              <button onClick={() => setDrawer(true)} className="inline-flex h-11 shrink-0 items-center gap-2 rounded-full bg-primary px-4 font-bold text-primary-foreground lg:hidden">
+                <ShoppingBag className="size-5" />Cart ({props.count})
+              </button>
+            </div>
           </header>
           <section className="px-4 pt-5 sm:px-6">
             <h1 className="font-display text-3xl leading-tight sm:text-5xl">What are you <span className="text-accent">craving</span> today?</h1>
