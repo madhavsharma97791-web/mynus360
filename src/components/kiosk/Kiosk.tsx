@@ -1,11 +1,12 @@
 import { useMemo, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useServerFn } from "@tanstack/react-start";
-import { ArrowLeft, ArrowRight, Check, Clock3, Minus, Plus, Printer, Search, ShoppingBag, Trash2, X } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, ChevronDown, Clock3, Crown, Croissant, CupSoda, Hamburger, IceCream, IceCreamCone, MapPin, Martini, Milk, Minus, Pizza, Plus, Printer, Sandwich, Salad, Search, ShoppingBag, ShoppingCart, Soup, Trash2, UtensilsCrossed, Wheat, X } from "lucide-react";
 import { CATEGORIES, LOGO_URL, MENU, STORE_URL, fromPrice, rupee, type Category, type MenuItem } from "@/lib/menu";
 import { OWNER_WHATSAPP, orderText, type CartLine, type NotifyResult, type Order } from "@/lib/order-types";
 import { notifyOwner } from "@/lib/notify.functions";
 import { placeOrder as submitOrder } from "@/lib/orders.functions";
+import { MENU_BLURBS } from "@/lib/menu-blurbs";
 
 type Step = "welcome" | "menu" | "review" | "type" | "details" | "payment" | "done";
 
