@@ -164,6 +164,13 @@ function Welcome({ onStart }: { onStart: () => void }) {
 }
 
 /* ---------------- Menu ---------------- */
+const CAT_ICONS = {
+  Burgers: Hamburger, Sandwiches: Sandwich, Wraps: Croissant, Fries: CupSoda,
+  Pasta: Soup, "Garlic Bread": Wheat, Momos: Salad, Chinese: UtensilsCrossed,
+  Pizza: Pizza, Desserts: IceCreamCone, Mocktails: Martini, Shakes: Milk,
+  "Premium Shakes": Milk,
+} satisfies Record<Category, typeof Hamburger>;
+
 function MenuScreen(props: {
   menu: MenuItem[];
   cart: CartLine[]; subtotal: number; count: number;
@@ -171,7 +178,7 @@ function MenuScreen(props: {
   onQty: (k: string, d: number) => void; onRemove: (k: string) => void;
   onProceed: () => void; onHome: () => void;
 }) {
-  const [cat, setCat] = useState<Category | "All">("All");
+  const [cat, setCat] = useState<Category>("Burgers");
   const [q, setQ] = useState("");
   const [open, setOpen] = useState<MenuItem | null>(null);
   const [drawer, setDrawer] = useState(false);
@@ -179,8 +186,8 @@ function MenuScreen(props: {
 
   const items = useMemo(() => {
     const t = q.trim().toLowerCase();
-    return props.menu.filter((i) => (cat === "All" || i.category === cat) &&
-      (!t || `${i.name} ${i.category} ${i.group ?? ""} ${i.note ?? ""}`.toLowerCase().includes(t)));
+    const pool = t ? props.menu : props.menu.filter((i) => i.category === cat);
+    return pool.filter((i) => !t || `${i.name} ${i.category} ${i.group ?? ""} ${i.note ?? ""}`.toLowerCase().includes(t));
   }, [cat, q, props.menu]);
 
   const handleAdd = (i: MenuItem, size: string, price: number, qty: number) => {
@@ -197,66 +204,105 @@ function MenuScreen(props: {
     props.onAdd(i, s.label, s.price, 1);
   };
   const quickMinus = (i: MenuItem) => props.onQty(`${i.id}|${i.sizes[0]?.label ?? ""}`, -1);
-  const thumb = (c: Category) => props.menu.find((i) => i.category === c && i.image)?.image;
-  const pick = (c: Category | "All") => { setCat(c); document.getElementById("menu-grid")?.scrollTo({ top: 0, behavior: "smooth" }); };
+  const hero = props.menu.find((i) => i.category === cat && i.image)?.image;
+  const pick = (c: Category) => { setCat(c); setQ(""); document.getElementById("menu-grid")?.scrollTo({ top: 0, behavior: "smooth" }); };
 
   return (
-    <div className="menu-theme flex h-dvh flex-col bg-background text-foreground lg:flex-row">
+    <div className="menu-theme flex h-dvh flex-col overflow-hidden bg-background text-foreground lg:flex-row">
+      <aside className="hidden w-60 shrink-0 flex-col bg-foreground text-background lg:flex">
+        <button onClick={props.onHome} aria-label="Back to welcome screen" className="flex flex-col items-center gap-1 px-4 pt-5 pb-4 text-center">
+          <img src={LOGO_URL} alt="MYNUS 360" className="size-20 rounded-full object-contain" />
+          <span className="font-display text-lg leading-none">Mynus 360</span>
+          <span className="text-[11px] font-bold uppercase tracking-[0.14em] opacity-80">Good Food • Great Mood</span>
+          <span className="text-[10px] uppercase tracking-[0.14em] opacity-60">Mitha Bazar, Jalandhar</span>
+        </button>
+        <nav aria-label="Categories" className="no-scrollbar flex-1 overflow-y-auto px-3 pb-4">
+          <ul className="space-y-1">
+            {CATEGORIES.map((c) => {
+              const Icon = CAT_ICONS[c];
+              const on = cat === c;
+              return (
+                <li key={c}>
+                  <button onClick={() => pick(c)} aria-pressed={on}
+                    className={`flex w-full items-center gap-3 rounded-full px-3 py-2 text-left text-sm font-extrabold transition active:scale-[0.98] ${on ? "bg-primary text-primary-foreground" : "hover:bg-background/10"}`}>
+                    <Icon aria-hidden className="size-5 shrink-0" />
+                    <span className="truncate">{c}</span>
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+        </nav>
+      </aside>
+
       <div className="flex min-h-0 min-w-0 flex-1 flex-col">
         <main id="menu-grid" className="flex-1 overflow-y-auto overflow-x-hidden pb-28 lg:pb-8">
-          <header className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-b-[2rem] bg-foreground px-4 py-3 text-background sm:px-6">
-            <button onClick={props.onHome} aria-label="Back to welcome screen" className="flex min-w-0 items-center gap-3 text-left">
-              <img src={LOGO_URL} alt="MYNUS 360" className="size-12 shrink-0 rounded-full object-contain sm:size-14" />
-              <span className="min-w-0">
-                <span className="block truncate font-display text-base text-primary sm:text-lg">GOOD FOOD • GREAT MOOD</span>
-                <span className="block truncate text-xs opacity-75">Mitha Bazar, Jalandhar</span>
-              </span>
-            </button>
-            <div className="flex flex-col items-end gap-2 sm:flex-row sm:items-center">
-              <div role="note" aria-label="Your order preparation time: 15–20 mins" className="flex shrink-0 items-center gap-2 rounded-lg bg-primary px-3 py-2 text-primary-foreground">
-                <Clock3 aria-hidden="true" className="size-6 shrink-0 text-accent" />
-                <span>
-                  <span className="block text-[10px] font-semibold leading-tight">Your order preparation time</span>
-                  <span className="block text-base font-extrabold leading-tight">15–20 mins</span>
-                </span>
-              </div>
-              <button onClick={() => setDrawer(true)} className="inline-flex h-11 shrink-0 items-center gap-2 rounded-full bg-primary px-4 font-bold text-primary-foreground lg:hidden">
-                <ShoppingBag className="size-5" />Cart ({props.count})
+          <section className="menu-hero relative overflow-hidden px-4 pt-4 sm:px-6">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <button onClick={props.onHome} aria-label="Back to welcome screen" className="lg:hidden">
+                <img src={LOGO_URL} alt="MYNUS 360" className="size-11 rounded-full object-contain" />
               </button>
+              <div className="ml-auto flex flex-wrap items-center justify-end gap-2">
+                <div role="note" aria-label="Your order preparation time: 15–20 mins" className="flex items-center gap-2 rounded-xl bg-primary px-3 py-1.5 text-primary-foreground">
+                  <Clock3 aria-hidden className="size-5 shrink-0" />
+                  <span>
+                    <span className="block text-[10px] font-semibold leading-tight">Your order preparation time</span>
+                    <span className="block text-sm font-extrabold leading-tight">15–20 mins</span>
+                  </span>
+                </div>
+                <div className="flex items-center gap-2 rounded-xl border border-border bg-card px-3 py-2 text-xs font-bold sm:text-sm">
+                  <MapPin aria-hidden className="size-4 shrink-0 text-accent" />
+                  <span className="whitespace-nowrap">Mitha Bazar, Jalandhar</span>
+                  <ChevronDown aria-hidden className="size-4 opacity-50" />
+                </div>
+              </div>
             </div>
-          </header>
-          <section className="px-4 pt-5 sm:px-6">
-            <h1 className="font-display text-3xl leading-tight sm:text-5xl">What are you <span className="text-accent">craving</span> today?</h1>
-            <p className="mt-1 text-sm text-muted-foreground sm:text-base">Freshly made favourites, just a tap away!</p>
+
+            <div className="relative mt-5 grid items-center gap-4 sm:grid-cols-[minmax(0,1fr)_auto]">
+              <div className="min-w-0">
+                <span className="menu-brush inline-flex px-4 py-1 text-xs font-black uppercase tracking-wide sm:text-sm">Freshly Made</span>
+                <h1 className="font-display mt-2 text-4xl uppercase leading-[0.95] sm:text-6xl">{cat}</h1>
+                <p className="mt-1 text-sm font-extrabold uppercase tracking-wide sm:text-lg">
+                  {cat === "Burgers" ? "Bigger bites. Happier days." : "Good food. Great mood."}
+                </p>
+              </div>
+              {hero && (
+                <div className="flex items-center justify-center gap-3">
+                  <img src={hero} alt="" aria-hidden className="menu-hero-img size-28 rounded-full object-cover sm:size-40" />
+                  <span className="hidden flex-col items-center text-center sm:flex">
+                    <Crown aria-hidden className="size-7 text-accent" />
+                    <span className="font-display mt-1 text-[11px] uppercase leading-tight">Good Food<br />Great Mood</span>
+                  </span>
+                </div>
+              )}
+            </div>
+
             <div className="relative mt-4">
-              <Search className="pointer-events-none absolute left-4 top-1/2 size-5 -translate-y-1/2 text-muted-foreground" />
-              <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search pizza, momos, shakes..."
+              <Search aria-hidden className="pointer-events-none absolute left-4 top-1/2 size-5 -translate-y-1/2 opacity-60" />
+              <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search for burgers, sandwiches, pizza, fries..."
                 className="h-12 w-full min-w-0 rounded-full border border-border bg-card pl-12 pr-11 text-base shadow-sm outline-none focus:border-primary sm:h-14" />
               {q && <button onClick={() => setQ("")} aria-label="Clear search" className="absolute right-2 top-1/2 -translate-y-1/2 p-2"><X className="size-5" /></button>}
             </div>
           </section>
-          <nav aria-label="Categories" className="no-scrollbar mt-4 flex gap-2.5 overflow-x-auto px-4 pb-2 sm:px-6">
-            {(["All", ...CATEGORIES] as const).map((c) => {
-              const src = c === "All" ? undefined : thumb(c);
+
+          <nav aria-label="Categories" className="no-scrollbar mt-4 flex gap-2 overflow-x-auto px-4 lg:hidden">
+            {CATEGORIES.map((c) => {
+              const Icon = CAT_ICONS[c];
               const on = cat === c;
               return (
                 <button key={c} onClick={() => pick(c)} aria-pressed={on}
-                  className={`flex w-[5.5rem] shrink-0 flex-col items-center gap-1.5 rounded-2xl border p-2 shadow-sm transition active:scale-95 sm:w-24 ${on ? "border-primary bg-primary" : "border-border bg-card hover:border-primary"}`}>
-                  <span className="block size-14 overflow-hidden rounded-xl bg-secondary">
-                    {src ? <img src={src} alt="" loading="lazy" className="size-full object-cover" /> : <span className="grid size-full place-items-center font-display text-lg">All</span>}
-                  </span>
-                  <span className="w-full truncate text-center text-xs font-bold">{c}</span>
+                  className={`flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-2 text-xs font-extrabold transition active:scale-95 ${on ? "border-primary bg-primary text-primary-foreground" : "border-border bg-card"}`}>
+                  <Icon aria-hidden className="size-4" />{c}
                 </button>
               );
             })}
           </nav>
+
           <section className="px-4 pt-4 sm:px-6">
-            <h2 className="font-display text-2xl sm:text-3xl">{cat === "All" ? "Your Favourites" : cat}</h2>
-            <p className="mb-3 text-sm text-muted-foreground">Good food. Great mood.</p>
             {items.length === 0 ? (
               <div className="grid place-items-center gap-3 rounded-2xl border border-border bg-card py-16 text-center">
                 <p className="font-display text-2xl">No dishes match</p>
-                <button onClick={() => { setQ(""); setCat("All"); }} className="rounded-full bg-primary px-5 py-2 font-bold text-primary-foreground">Show all dishes</button>
+                <button onClick={() => { setQ(""); setCat("Burgers"); }} className="rounded-full bg-primary px-5 py-2 font-bold text-primary-foreground">Show all dishes</button>
               </div>
             ) : (
               <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
@@ -267,11 +313,10 @@ function MenuScreen(props: {
         </main>
       </div>
 
-      <aside className="hidden w-[400px] shrink-0 flex-col border-l border-border bg-card lg:flex">
+      <aside className="hidden w-[360px] shrink-0 flex-col border-l border-border bg-card lg:flex">
         <CartPanel {...props} />
       </aside>
 
-      {/* Small screens: sticky cart bar + drawer */}
       <div className="fixed inset-x-0 bottom-0 z-30 border-t border-border bg-card p-3 lg:hidden">
         <button onClick={() => setDrawer(true)} className="flex h-14 w-full items-center justify-between rounded-lg bg-primary px-5 text-primary-foreground">
           <span className="flex items-center gap-2 text-base font-bold"><ShoppingBag className="size-6" /> {props.count} items · View cart</span>
